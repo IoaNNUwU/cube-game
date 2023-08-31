@@ -1,0 +1,39 @@
+[package]
+name = "cube-game"
+version.workspace = true
+edition.workspace = true
+
+[workspace.package]
+version = "0.0.1"
+edition = "2021"
+repository = "https://github.com/ioannuwu"
+license = "MIT"
+
+[dependencies]
+common.workspace = true
+server.workspace = true
+client.workspace = true
+server_bin = { path = "server_crates/server_bin" }
+client_bin = { path = "client_crates/client_bin" }
+
+[workspace.dependencies]
+server = { path = "server_crates/server" }
+common = { path = "common_crates/common" }
+client = { path = "client_crates/client" }
+
+[[bin]]
+name = "client"
+path = "bin/client.rs"
+
+[[bin]]
+name = "server"
+path = "bin/server.rs"
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.dev]
+opt-level = 1
+
+[workspace]
+members = ["client_crates/*", "server_crates/*", "common_crates/*"]

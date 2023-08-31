@@ -1,0 +1,6 @@
+/.idea
+/.lapce
+/.vscode
+
+target
+Cargo.lock
