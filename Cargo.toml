@@ -2,6 +2,8 @@
 name = "cube-game"
 version.workspace = true
 edition.workspace = true
+repository.workspace = true
+license.workspace = true
 
 [workspace.package]
 version = "0.0.1"
@@ -10,16 +12,15 @@ repository = "https://github.com/ioannuwu"
 license = "MIT"
 
 [dependencies]
-common.workspace = true
-server.workspace = true
-client.workspace = true
 server_bin = { path = "server_crates/server_bin" }
 client_bin = { path = "client_crates/client_bin" }
 
 [workspace.dependencies]
-server = { path = "server_crates/server" }
-common = { path = "common_crates/common" }
-client = { path = "client_crates/client" }
+basic = { path = "common_crates/basic" }
+protocol = { path = "common_crates/protocol" }
+
+serde = { version = "1.0.183", features = ["derive"] }
+serde_json = "1.0.104"
 
 [[bin]]
 name = "client"
