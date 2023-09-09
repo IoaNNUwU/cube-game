@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Default, Clone, Ord, PartialOrd, Eq, PartialEq, Debug, Serialize, Deserialize)]
+#[derive(Default, Clone, Hash, Debug)]
+#[derive(Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Serialize, Deserialize)]
 #[repr(u8)]
 pub enum Transformation {
     #[default]
@@ -10,7 +12,9 @@ pub enum Transformation {
     Torch(TorchTransformation),
 }
 
-#[derive(Default, Clone, Ord, PartialOrd, Eq, PartialEq, Debug, Serialize, Deserialize)]
+#[derive(Default, Clone, Hash, Debug)]
+#[derive(Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Serialize, Deserialize)]
 pub enum HalfBlockTransformation {
     #[default]
     DownHalfSolid,
@@ -21,7 +25,9 @@ pub enum HalfBlockTransformation {
     WestHalfSolid,
 }
 
-#[derive(Default, Clone, Ord, PartialOrd, Eq, PartialEq, Debug, Serialize, Deserialize)]
+#[derive(Default, Clone, Hash, Debug)]
+#[derive(Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Serialize, Deserialize)]
 pub enum StairsTransformation {
     #[default]
     LowerNorth,
@@ -34,7 +40,9 @@ pub enum StairsTransformation {
     FlippedLowerWest,
 }
 
-#[derive(Default, Clone, Ord, PartialOrd, Eq, PartialEq, Debug, Serialize, Deserialize)]
+#[derive(Default, Clone, Hash, Debug)]
+#[derive(Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Serialize, Deserialize)]
 pub enum TorchTransformation {
     #[default]
     OnNorthWall,

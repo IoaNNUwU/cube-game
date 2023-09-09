@@ -1,5 +1,5 @@
 [package]
-name = "server_bin"
+name = "window"
 version.workspace = true
 edition.workspace = true
 repository.workspace = true
@@ -9,11 +9,9 @@ license.workspace = true
 
 [dependencies]
 
-# Server crates
-
 # Common crates
-protocol.workspace = true
 basic.workspace = true
 
 # External crates
 bevy.workspace = true
+textures.workspace = true

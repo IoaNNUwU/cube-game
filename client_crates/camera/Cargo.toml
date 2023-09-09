@@ -1,0 +1,11 @@
+[package]
+name = "camera"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+license.workspace = true
+
+[dependencies]
+
+# External crates
+bevy.workspace = true

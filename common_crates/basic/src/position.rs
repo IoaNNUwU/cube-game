@@ -9,7 +9,9 @@ pub const WORLD_HEIGHT_BLOCKS: i32 = WORLD_HEIGHT_CHUNKS * CHUNK_HEIGHT;
 pub const WORLD_WIDTH_CHUNKS: i32 = 3_000_000;
 pub const WORLD_WIDTH_BLOCKS: i32 = WORLD_WIDTH_CHUNKS * CHUNK_WIDTH;
 
-#[derive(Default, Clone, Ord, PartialOrd, Eq, PartialEq, Debug, Serialize, Deserialize)]
+#[derive(Default, Clone, Hash, Debug)]
+#[derive(Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Serialize, Deserialize)]
 pub struct WorldBlockPosition {
     pub x: u32,
     pub y: u32,
@@ -22,7 +24,9 @@ impl WorldBlockPosition {
     }
 }
 
-#[derive(Default, Clone, PartialOrd, PartialEq, Debug, Serialize, Deserialize)]
+#[derive(Default, Clone, Debug)]
+#[derive(PartialOrd, PartialEq)]
+#[derive(Serialize, Deserialize)]
 pub struct WorldPosition {
     pub x: f32,
     pub y: f32,

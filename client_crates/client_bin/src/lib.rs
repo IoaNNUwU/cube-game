@@ -1,30 +1,144 @@
-use protocol::server2client::FromServerPacket;
-use std::io::Read;
-use std::net::TcpStream;
+use std::f32::consts::PI;
+use bevy::prelude::*;
+
+use bevy::DefaultPlugins;
+use camera::{CubeCameraBundle, CubeCameraMarker, CubeCameraPlugin};
+use textures::TexturesPlugin;
+use window::{CubeWindowPlugin, ClientState};
 
 pub fn run_client() {
-    let addr = "127.0.0.1:25533";
+    App::new()
+        .add_plugins(
+            DefaultPlugins.set(ImagePlugin::default_nearest())
+        )
+        .add_plugins(
+            (TexturesPlugin,
+             CubeWindowPlugin,
+             CubeCameraPlugin, ))
+        .add_systems(OnEnter(ClientState::InGame), setup)
+        .add_systems(
+            Update, (
+                system.run_if(in_state(ClientState::InGame)),
+                update_config.run_if(in_state(ClientState::InGame))))
+        .run();
+}
 
-    let mut tcp_stream = TcpStream::connect(addr).expect("Unable to connect");
 
-    let mut buf: [u8; 8162] = std::array::from_fn(|_| 0);
+fn setup(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
+    println!("SETUP SETUP");
+    commands.spawn(CubeCameraBundle {
+        camera: Camera3dBundle {
+            transform: Transform::from_xyz(0., 1.5, 6.).looking_at(Vec3::ZERO, Vec3::Y),
+            ..default()
+        },
+        marker: CubeCameraMarker,
+    });
 
-    loop {
-        let read_size = tcp_stream.read(&mut buf).expect("Unable to read");
+    // plane
+    commands.spawn(PbrBundle {
+        mesh: meshes.add(Mesh::from(shape::Plane::from_size(5.0))),
+        material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
+        ..default()
+    });
+    // cube
+    commands.spawn(PbrBundle {
+        mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+        material: materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
+        transform: Transform::from_xyz(0.0, 0.5, 0.0),
+        ..default()
+    });
+    // light
+    commands.spawn(PointLightBundle {
+        point_light: PointLight {
+            intensity: 1500.0,
+            shadows_enabled: true,
+            ..default()
+        },
+        transform: Transform::from_xyz(4.0, 8.0, 4.0),
+        ..default()
+    });
 
-        let buf_cut = buf.iter().take(read_size).copied().collect::<Vec<_>>();
+    // example instructions
+    commands.spawn(
+        TextBundle::from_section(
+            "Press 'D' to toggle drawing gizmos on top of everything else in the scene\n\
+            Press 'P' to toggle perspective for line gizmos\n\
+            Hold 'Left' or 'Right' to change the line width",
+            TextStyle {
+                font_size: 20.,
+                ..default()
+            },
+        )
+            .with_style(Style {
+                position_type: PositionType::Absolute,
+                top: Val::Px(12.0),
+                left: Val::Px(12.0),
+                ..default()
+            }),
+    );
+}
 
-        let Ok(packet) = serde_json::from_slice::<FromServerPacket>(buf_cut.as_slice()) else {
-            continue;
-        };
+fn system(mut gizmos: Gizmos, time: Res<Time>) {
+    gizmos.cuboid(
+        Transform::from_translation(Vec3::Y * 0.5).with_scale(Vec3::splat(1.)),
+        Color::BLACK,
+    );
+    gizmos.rect(
+        Vec3::new(time.elapsed_seconds().cos() * 2.5, 1., 0.),
+        Quat::from_rotation_y(PI / 2.),
+        Vec2::splat(2.),
+        Color::GREEN,
+    );
 
-        match packet {
-            FromServerPacket::HandShake(packet) => {
-                println!("Handshake {}", packet.server_name);
-            }
-            FromServerPacket::SetBlock(packet) => {
-                println!("SetBlock {:?} on {:?}", packet.block_state, packet.position);
-            }
-        };
+    gizmos.sphere(Vec3::new(1., 0.5, 0.), Quat::IDENTITY, 0.5, Color::RED);
+
+    for y in [0., 0.5, 1.] {
+        gizmos.ray(
+            Vec3::new(1., y, 0.),
+            Vec3::new(-3., (time.elapsed_seconds() * 3.).sin(), 0.),
+            Color::BLUE,
+        );
+    }
+
+    // Circles have 32 line-segments by default.
+    gizmos.circle(Vec3::ZERO, Vec3::Y, 3., Color::BLACK);
+    // You may want to increase this for larger circles or spheres.
+    gizmos
+        .circle(Vec3::ZERO, Vec3::Y, 3.1, Color::NAVY)
+        .segments(64);
+    gizmos
+        .sphere(Vec3::ZERO, Quat::IDENTITY, 3.2, Color::BLACK)
+        .circle_segments(64);
+}
+
+fn update_config(mut config: ResMut<GizmoConfig>, keyboard: Res<Input<KeyCode>>, time: Res<Time>) {
+    if keyboard.just_pressed(KeyCode::D) {
+        config.depth_bias = if config.depth_bias == 0. { -1. } else { 0. };
+    }
+    if keyboard.just_pressed(KeyCode::P) {
+        // Toggle line_perspective
+        config.line_perspective ^= true;
+        // Increase the line width when line_perspective is on
+        config.line_width *= if config.line_perspective { 5. } else { 1. / 5. };
+    }
+
+    if keyboard.pressed(KeyCode::Right) {
+        config.line_width += 5. * time.delta_seconds();
+    }
+    if keyboard.pressed(KeyCode::Left) {
+        config.line_width -= 5. * time.delta_seconds();
     }
 }
+
+
+
+
+
+
+
+
+
