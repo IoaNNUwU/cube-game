@@ -1,14 +1,4 @@
-## example rust project
-Shows project structure with different modules and crates depending on each other.
+## Cube Game in Rust Language
 
-Modules:
-- client_crates
-- server_crates
-- common_crates
-
-Each module is a folder that contains specific crates.
-Project is organized using `Cargo Workspaces` [see `Cargo.toml`](Cargo.toml)
-
-Run:
-- `cargo run --bin server`
-- `cargo run --bin client`
+Minecraft-like game which aims to overtake the original one 
+by adding new mechanics, bosses and RPG elements inspired by terraria.
