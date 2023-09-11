@@ -1,0 +1,3 @@
+
+pub const DEFAULT_SERVER_ADDRESS: &str = "127.0.0.1:25544";
+pub const DEFAULT_CLIENT_BIND_ADDRESS: &str = "127.0.0.1:25543";

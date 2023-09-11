@@ -8,5 +8,10 @@ license.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-basic.workspace = true
+# External crates
+serde_json = "1.0.104"
+
 serde.workspace = true
+
+# Common crates
+basic.workspace = true

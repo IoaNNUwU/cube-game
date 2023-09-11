@@ -1,6 +1,7 @@
 use bevy::app::AppExit;
 use bevy::prelude::*;
-use crate::ClientState;
+
+use client_state::ClientState;
 
 mod main_menu;
 mod settings_menu;

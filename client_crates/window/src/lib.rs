@@ -10,23 +10,11 @@ impl Plugin for CubeWindowPlugin {
         // Insert as resource the initial value for the settings resources
         app.insert_resource(Volume(7))
             .insert_resource(DisplayQuality::Medium)
-            .add_state::<ClientState>()
             .add_plugins((
                 loading_screen::LoadingScreenUIElementsPlugin,
                 menu::MenuUiElementsPlugin,
             ));
     }
-}
-
-#[derive(States)]
-#[derive(Copy, Clone)]
-#[derive(Ord, PartialOrd, Eq, PartialEq)]
-#[derive(Default, Debug, Hash)]
-pub enum ClientState {
-    #[default]
-    Loading,
-    Menu,
-    InGame,
 }
 
 #[derive(States)]

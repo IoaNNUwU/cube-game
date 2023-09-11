@@ -10,6 +10,7 @@ license.workspace = true
 [dependencies]
 
 # Server crates
+server_network.workspace = true
 
 # Common crates
 protocol.workspace = true

@@ -1,5 +1,5 @@
 [package]
-name = "window"
+name = "gameplay"
 version.workspace = true
 edition.workspace = true
 repository.workspace = true
@@ -10,10 +10,7 @@ license.workspace = true
 [dependencies]
 # Client crates
 client_state.workspace = true
-
-# Common crates
-basic.workspace = true
+camera.workspace = true
 
 # External crates
 bevy.workspace = true
-textures.workspace = true

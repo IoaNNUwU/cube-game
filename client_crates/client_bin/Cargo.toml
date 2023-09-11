@@ -13,6 +13,9 @@ license.workspace = true
 textures.workspace = true
 window.workspace = true
 camera.workspace = true
+client_network.workspace = true
+gameplay.workspace = true
+client_state.workspace = true
 
 # Common crates
 protocol.workspace = true

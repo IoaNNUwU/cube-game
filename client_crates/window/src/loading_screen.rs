@@ -1,9 +1,8 @@
 use bevy::prelude::*;
-use bevy::sprite::{Anchor, SpriteBatch};
 use basic::block::BlockType::*;
 use textures::AssociatedTexture;
 
-use crate::ClientState;
+use client_state::ClientState;
 
 pub struct LoadingScreenUIElementsPlugin;
 
