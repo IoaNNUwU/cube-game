@@ -1,5 +1,5 @@
 [package]
-name = "world"
+name = "client_world"
 version.workspace = true
 edition.workspace = true
 repository.workspace = true

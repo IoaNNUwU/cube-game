@@ -1,14 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-pub const CHUNK_WIDTH: i32 = 16;
-pub const CHUNK_HEIGHT: i32 = 16;
-
-pub const WORLD_HEIGHT_CHUNKS: i32 = 32;
-pub const WORLD_HEIGHT_BLOCKS: i32 = WORLD_HEIGHT_CHUNKS * CHUNK_HEIGHT;
-
-pub const WORLD_WIDTH_CHUNKS: i32 = 3_000_000;
-pub const WORLD_WIDTH_BLOCKS: i32 = WORLD_WIDTH_CHUNKS * CHUNK_WIDTH;
-
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Default, Clone, Hash, Debug)]
 #[derive(Serialize, Deserialize)]

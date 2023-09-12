@@ -1,5 +1,5 @@
 [package]
-name = "client_network"
+name = "server_gameplay"
 version.workspace = true
 edition.workspace = true
 repository.workspace = true
@@ -9,6 +9,8 @@ license.workspace = true
 
 [dependencies]
 bevy.workspace = true
+
 common_network.workspace = true
 protocol.workspace = true
-bevy_renet.workspace = true
+
+server_network.workspace = true

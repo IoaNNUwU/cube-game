@@ -1,61 +1,85 @@
-use std::net::{SocketAddr, UdpSocket};
-use std::time::SystemTime;
 use bevy::prelude::*;
-use bevy_renet::{RenetClientPlugin, RenetServerPlugin};
-use bevy_renet::renet::{ConnectionConfig, DefaultChannel, RenetClient};
-use bevy_renet::renet::transport::{ClientAuthentication, NetcodeClientTransport};
+use bevy_renet::RenetClientPlugin;
+use bevy_renet::renet::{DefaultChannel, RenetClient};
 use bevy_renet::transport::NetcodeClientPlugin;
-use connection::{DEFAULT_CLIENT_BIND_ADDRESS, DEFAULT_SERVER_ADDRESS};
-use protocol::client2server::{Client2ServerPacket, ClientGivesHandshake};
-use protocol::PROTOCOL_VERSION;
-use protocol::server2client::{Server2ClientPacket, ServerGivesHandshake};
+use protocol::client2server::{Client2ServerPacket, C2sHandShake};
+use protocol::server2client::Server2ClientPacket;
+
+mod config;
 
 pub struct ClientNetworkPlugin;
 
 impl Plugin for ClientNetworkPlugin {
     fn build(&self, app: &mut App) {
-        let (client, transport) = new_renet_client();
+        let (client, transport) = config::config_client(None, None);
 
         app
+            .init_resource::<Events<Client2ServerEvent>>()
+            .init_resource::<Events<Server2ClientEvent>>()
+
             .insert_resource(client)
             .insert_resource(transport)
+
             .add_plugins((
                 RenetClientPlugin,
                 NetcodeClientPlugin,
             ))
             .add_systems(
-                Update, (
-                    client_send.run_if(bevy_renet::transport::client_connected()),
+                PreUpdate, (
+                    send_s2c_events_on_message_from_server,
+                    send_message_to_server_on_c2s_events,
+                    send_handshake_on_message_from_server,
                 ));
     }
 }
 
-fn new_renet_client() -> (RenetClient, NetcodeClientTransport) {
-    let client = RenetClient::new(ConnectionConfig::default());
-    let server_addr: SocketAddr = DEFAULT_SERVER_ADDRESS.parse().unwrap();
-    let socket = UdpSocket::bind(DEFAULT_CLIENT_BIND_ADDRESS).unwrap();
-    let current_time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap();
-    let client_id = current_time.as_millis() as u64;
-    let authentication = ClientAuthentication::Unsecure {
-        client_id,
-        protocol_id: PROTOCOL_VERSION,
-        server_addr,
-        user_data: None,
-    };
-
-    let transport = NetcodeClientTransport::new(current_time, authentication, socket).unwrap();
-
-    (client, transport)
+#[derive(Event)]
+pub struct Client2ServerEvent {
+    pub packet: Client2ServerPacket,
 }
 
-fn client_send(mut client: ResMut<RenetClient>) {
-    let packet = protocol::serialize(
-        &Client2ServerPacket::HandShake(
-            ClientGivesHandshake {
-                player_name: "player1".to_string(),
-            })
-    );
+#[derive(Event)]
+pub struct Server2ClientEvent {
+    pub packet: Server2ClientPacket,
+}
 
-    println!("Send {:?}", packet);
-    client.send_message(DefaultChannel::ReliableOrdered, packet);
+fn send_s2c_events_on_message_from_server(
+    mut client: ResMut<RenetClient>,
+    mut receive_packet_events: EventWriter<Server2ClientEvent>,
+) {
+    while let Some(packet) = client.receive_message(DefaultChannel::ReliableOrdered) {
+        if let Ok(packet) = protocol::deserialize::<Server2ClientPacket>(packet.as_ref()) {
+            receive_packet_events.send(Server2ClientEvent { packet });
+        };
+    }
+}
+
+fn send_message_to_server_on_c2s_events(
+    mut client: ResMut<RenetClient>,
+    mut receive_packet_events: EventReader<Client2ServerEvent>,
+) {
+    for event in receive_packet_events.iter() {
+        let message = protocol::serialize(&event.packet);
+        client.send_message(DefaultChannel::ReliableOrdered, message);
+    }
+}
+
+fn send_handshake_on_message_from_server(
+    mut client: ResMut<RenetClient>,
+    mut incoming_events: EventReader<Server2ClientEvent>,
+) {
+    for event in incoming_events.iter() {
+        match &event.packet {
+            Server2ClientPacket::HandShake(p) => {
+                println!("handshake from server `{}`", p.server_name);
+                let message = protocol::serialize(
+                    &Client2ServerPacket::HandShake(
+                        C2sHandShake {
+                            player_name: "steve1".to_string(),
+                        }));
+                client.send_message(DefaultChannel::ReliableOrdered, message);
+            }
+            _ => {}
+        }
+    }
 }

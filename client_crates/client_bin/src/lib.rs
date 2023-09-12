@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use bevy::DefaultPlugins;
 use client_network::ClientNetworkPlugin;
 use client_state::ClientStatePlugin;
-use gameplay::GameplayPlugin;
+use client_gameplay::ClientGameplayPlugin;
 use textures::TexturesPlugin;
 use window::CubeWindowPlugin;
 
@@ -17,7 +17,7 @@ pub fn run_client() {
             ClientNetworkPlugin,
             TexturesPlugin,
             CubeWindowPlugin,
-            GameplayPlugin,
+            ClientGameplayPlugin,
         ))
         .run();
 }

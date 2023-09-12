@@ -6,12 +6,12 @@ pub mod server2client;
 
 pub const PROTOCOL_VERSION: u64 = 1;
 
-pub fn serialize<T: Serialize>(value: &T) -> Vec<u8> {
-    serde_json::to_vec(value).expect("Serialization failed")
+pub fn serialize<T: Serialize>(value: &T) -> Box<[u8]> {
+    serde_json::to_vec(value).expect("Serialization failed").into_boxed_slice()
 }
 
-pub fn serialize_owned<T: Serialize>(value: T) -> Vec<u8> {
-    serde_json::to_vec(&value).expect("Serialization failed")
+pub fn serialize_owned<T: Serialize>(value: T) -> Box<[u8]> {
+    serialize(&value)
 }
 
 pub fn deserialize<'a, T: Deserialize<'a>>(slice: &'a [u8]) -> Result<T, Error> {

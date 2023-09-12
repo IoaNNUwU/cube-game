@@ -1,5 +1,5 @@
 [package]
-name = "client_network"
+name = "world"
 version.workspace = true
 edition.workspace = true
 repository.workspace = true
@@ -8,7 +8,5 @@ license.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy.workspace = true
-common_network.workspace = true
-protocol.workspace = true
-bevy_renet.workspace = true
+basic.workspace = true
+serde.workspace = true

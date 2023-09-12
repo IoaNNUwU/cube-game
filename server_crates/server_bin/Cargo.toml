@@ -11,6 +11,7 @@ license.workspace = true
 
 # Server crates
 server_network.workspace = true
+server_gameplay.workspace = true
 
 # Common crates
 protocol.workspace = true

@@ -22,8 +22,9 @@ members = ["client_crates/*", "server_crates/*", "common_crates/*"]
 
 # Common crates
 basic = { path = "common_crates/basic" }
+world = { path = "common_crates/world" }
 protocol = { path = "common_crates/protocol" }
-connection = { path = "common_crates/connection" }
+common_network = { path = "common_crates/common_network" }
 
 # Client crates
 textures = { path = "client_crates/textures" }
@@ -32,10 +33,11 @@ window = { path = "client_crates/window" }
 client_world = { path = "client_crates/client_world" }
 client_network = { path = "client_crates/client_network" }
 client_state = { path = "client_crates/client_state" }
-gameplay = { path = "client_crates/gameplay" }
+client_gameplay = { path = "client_crates/client_gameplay" }
 
 # Server crates
 server_network = { path = "server_crates/server_network" }
+server_gameplay = { path = "server_crates/server_gameplay" }
 
 # External crates
 serde = { version = "1.0.183", features = ["derive"] }
