@@ -1,78 +1,57 @@
 use std::ops::{Index, IndexMut};
 use serde::{Deserialize, Serialize};
-use basic::block::{BlockState, BlockType};
-use biome::Biome;
+use block::BlockState;
 
-pub const CHUNK_HEIGHT: usize = 32;
+use chunk::Chunk;
+use crate::chunk::PosInChunk;
+use crate::CHUNK_HEIGHT;
 
 pub const WORLD_HEIGHT_CHUNKS: usize = 32;
-pub const WORLD_HEIGHT_BLOCKS_U8: usize = WORLD_HEIGHT_CHUNKS * CHUNK_HEIGHT;
+pub const WORLD_HEIGHT_BLOCKS: usize = WORLD_HEIGHT_CHUNKS * CHUNK_HEIGHT;
 
-pub mod biome;
-pub mod cords;
+pub(crate) mod chunk;
 
-mod layer;
-
-pub use layer::*;
-
-/// [Index 0](Index) gives lowest layer in world
+/// [Index 0](Index) gives lowest chunk in column
 /// ```rust
-/// use world::world::Chunk;
+/// use world::ColumnOfChunks;
 ///
-/// let world = Chunk::default();
-/// let lowest_layer = &world[0];
-/// let lowest_block_with_min_xz = &world[0][0][0];
-/// ```
-#[derive(Default, Clone, Hash, Debug)]
-#[derive(Ord, PartialOrd, Eq, PartialEq)]
-#[derive(Serialize, Deserialize)]
-pub struct Chunk {
-    pub biome: Biome,
-    pub blocks: [ChunkLayer; CHUNK_HEIGHT],
-}
-
-impl Chunk {
-    pub fn empty() -> Self {
-        Self::default()
-    }
-
-    pub fn of_state(block_state: BlockState) -> Self {
-        Self {
-            biome: Default::default(),
-            blocks: std::array::from_fn(|_| ChunkLayer::of_state(block_state)),
-        }
-    }
-}
-
-impl Index<usize> for Chunk {
-    type Output = ChunkLayer;
-
-    fn index(&self, index: usize) -> &Self::Output {
-        &self.blocks[index]
-    }
-}
-
-impl IndexMut<usize> for Chunk {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        &mut self.blocks[index]
-    }
-}
-
-/// [Index 0](Index) gives lowest world in column
-/// ```rust
-/// use world::world::ChunksColumn;
-///
-/// let world_chunk = ChunksColumn::default();
+/// let world_chunk = ColumnOfChunks::default();
 /// let lowest_chunk = &world_chunk[0];
 /// ```
 #[derive(Default, Clone, Hash, Debug)]
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Serialize, Deserialize)]
-pub struct ChunksColumn {
+pub struct ColumnOfChunks {
     chunks: [Chunk; WORLD_HEIGHT_CHUNKS],
 }
 
-impl Index<usize> for ChunksColumn {
+impl ColumnOfChunks {
+    pub fn empty() -> Self {
+        Self::default()
+    }
+
+    pub fn from_fn<F: FnMut(PosInColumnOfChunks) -> BlockState>(mut pos_in_chunk_column_to_block_state_fn: F) -> Self {
+        Self {
+            chunks: std::array::from_fn(|chunk_number| {
+                Chunk::from_fn(|pos_in_chunk| {
+                    pos_in_chunk_column_to_block_state_fn(
+                        PosInColumnOfChunks::from_pos_in_chunk(pos_in_chunk, chunk_number)
+                    )
+                })
+            }),
+        }
+    }
+
+    pub fn from_fn_chunk<F: FnMut(usize) -> Chunk>(mut chunk_number_to_chunk_fn: F) -> Self {
+        Self {
+            chunks: std::array::from_fn(|chunk_number| {
+                chunk_number_to_chunk_fn(chunk_number)
+            }),
+        }
+    }
+}
+
+impl Index<usize> for ColumnOfChunks {
     type Output = Chunk;
 
     fn index(&self, index: usize) -> &Self::Output {
@@ -80,27 +59,62 @@ impl Index<usize> for ChunksColumn {
     }
 }
 
-impl IndexMut<usize> for ChunksColumn {
+impl IndexMut<usize> for ColumnOfChunks {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         &mut self.chunks[index]
     }
 }
 
+impl Index<PosInColumnOfChunks> for ColumnOfChunks {
+    type Output = BlockState;
+
+    fn index(&self, pos_in_column: PosInColumnOfChunks) -> &Self::Output {
+        &self.chunks[pos_in_column.chunk_number()][pos_in_column.as_pos_in_chunk()]
+    }
+}
+
+#[derive(Default, Clone, Hash, Debug)]
+#[derive(Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Serialize, Deserialize)]
+pub struct PosInColumnOfChunks {
+    pub x: u8,
+    pub y: u16,
+    pub z: u8,
+}
+
+impl PosInColumnOfChunks {
+    pub fn from_pos_in_chunk(pos_in_chunk: PosInChunk, chunk_number: usize) -> Self {
+        Self {
+            x: pos_in_chunk.x,
+            y: pos_in_chunk.y as u16 + (CHUNK_HEIGHT * chunk_number) as u16,
+            z: pos_in_chunk.z,
+        }
+    }
+
+    pub fn chunk_number(&self) -> usize {
+        (self.y / 16) as usize
+    }
+
+    pub fn as_pos_in_chunk(&self) -> PosInChunk {
+        PosInChunk::new(self.x, (self.y % 16) as u8, self.z)
+    }
+}
+
 mod test {
-    use basic::block::{BlockState, BlockType};
-    use crate::world::ChunkLayer;
+    use block::BlockState;
+    use block::solid_block::{CommonBlockAttrs, SolidBlock};
+    use crate::ColumnOfChunks;
+    use crate::replace::Replace;
 
     #[test]
-    fn chunk_layer_test() {
-        let layer = ChunkLayer::from_fn(|pos_in_layer| {
-            if pos_in_layer.x % 2 == 0 {
-                BlockState::with_type(BlockType::Stone)
-            } else {
-                BlockState::EMPTY
-            }
-        });
+    fn chunk_column_test() {
+        let mut chunks_column = ColumnOfChunks::default();
+        let lowest_block_with_lowest_xz = &mut chunks_column[0][0][(0, 0)];
 
-        assert_eq!(layer[(0, 0)], BlockState::with_type(BlockType::Stone));
-        assert_eq!(layer[(1, 0)], BlockState::with_type(BlockType::Stone));
+        assert_eq!(lowest_block_with_lowest_xz, &BlockState::Air);
+
+        lowest_block_with_lowest_xz.replace(BlockState::Solid(SolidBlock::Stone(CommonBlockAttrs::default())));
+
+        assert_eq!(lowest_block_with_lowest_xz, &BlockState::Solid(SolidBlock::Stone(CommonBlockAttrs::default())));
     }
 }

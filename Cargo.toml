@@ -16,12 +16,15 @@ server_bin = { path = "server_crates/server_bin" }
 client_bin = { path = "client_crates/client_bin" }
 
 [workspace]
-members = ["client_crates/*", "server_crates/*", "common_crates/*"]
+members = ["client_crates/*", "server_crates/*", "common_crates/*", "test_crates/*"]
 
 [workspace.dependencies]
 
 # Common crates
 basic = { path = "common_crates/basic" }
+block = { path = "common_crates/block" }
+item = { path = "common_crates/item" }
+block_item = { path = "common_crates/block_item" }
 world = { path = "common_crates/world" }
 protocol = { path = "common_crates/protocol" }
 common_network = { path = "common_crates/common_network" }
@@ -43,6 +46,9 @@ server_gameplay = { path = "server_crates/server_gameplay" }
 serde = { version = "1.0.183", features = ["derive"] }
 bevy_renet = "0.0.9"
 bevy = "0.11.0"
+strum = { version = "0.25", features = ["derive"] }
+serde_with = "3.3.0"
+heck = "0.5.0-rc.1"
 
 [[bin]]
 name = "client"

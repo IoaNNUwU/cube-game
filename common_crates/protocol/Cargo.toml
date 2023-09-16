@@ -15,3 +15,5 @@ serde.workspace = true
 
 # Common crates
 basic.workspace = true
+block.workspace = true
+world.workspace = true

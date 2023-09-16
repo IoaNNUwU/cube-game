@@ -8,5 +8,7 @@ license.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-basic.workspace = true
+block = { workspace = true, features = ["derive-display"] }
+item = { workspace = true, features = ["derive-display"] }
 bevy.workspace = true
+heck.workspace = true

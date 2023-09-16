@@ -1,5 +1,6 @@
 use bevy::prelude::*;
-use basic::block::BlockType::*;
+use item::Item;
+use item::solid_item::SolidBlockItem;
 use textures::AssociatedTexture;
 
 use super::*;
@@ -109,7 +110,7 @@ fn spawn_main_menu(
                             MenuButtonAction::MoveInWorld,
                         ))
                         .with_children(|parent| {
-                            let icon = asset_server.load(PlainsLeaves.texture_path());
+                            let icon = asset_server.load(&*SolidBlockItem::PlainsLeaves.texture_path().unwrap());
                             parent.spawn(ImageBundle {
                                 style: button_icon_style.clone(),
                                 image: UiImage::new(icon),
@@ -130,7 +131,7 @@ fn spawn_main_menu(
                             MenuButtonAction::MoveToSettings,
                         ))
                         .with_children(|parent| {
-                            let icon = asset_server.load(Dirt.texture_path());
+                            let icon = asset_server.load(&*SolidBlockItem::Dirt.texture_path().unwrap());
                             parent.spawn(ImageBundle {
                                 style: button_icon_style.clone(),
                                 image: UiImage::new(icon),
@@ -151,7 +152,7 @@ fn spawn_main_menu(
                             MenuButtonAction::Exit,
                         ))
                         .with_children(|parent| {
-                            let icon = asset_server.load(Stone.texture_path());
+                            let icon = asset_server.load(&*SolidBlockItem::Stone.texture_path().unwrap());
                             parent.spawn(ImageBundle {
                                 style: button_icon_style,
                                 image: UiImage::new(icon),

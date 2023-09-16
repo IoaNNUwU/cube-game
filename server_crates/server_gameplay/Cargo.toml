@@ -14,3 +14,4 @@ common_network.workspace = true
 protocol.workspace = true
 
 server_network.workspace = true
+world.workspace = true

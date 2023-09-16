@@ -1,8 +1,10 @@
 use bevy::prelude::*;
-use basic::block::BlockType::*;
+use block::BlockState;
+use block::solid_block::{CommonBlockAttrs, SolidBlock};
 use textures::AssociatedTexture;
 
 use client_state::ClientState;
+use item::solid_item::SolidBlockItem;
 
 pub struct LoadingScreenUIElementsPlugin;
 
@@ -58,7 +60,7 @@ fn spawn_main_menu_loading_screen(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
 ) {
-    let image_handle: Handle<Image> = asset_server.load(StoneBricks.texture_path());
+    let image_handle: Handle<Image> = asset_server.load(&*SolidBlockItem::Stone.texture_path().unwrap());
 
     commands.spawn((SpriteBundle {
         sprite: Sprite {

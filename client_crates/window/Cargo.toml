@@ -12,7 +12,8 @@ license.workspace = true
 client_state.workspace = true
 
 # Common crates
-basic.workspace = true
+block.workspace = true
+item.workspace = true
 
 # External crates
 bevy.workspace = true

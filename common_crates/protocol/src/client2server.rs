@@ -1,4 +1,4 @@
-use basic::block::BlockState;
+use block::BlockState;
 use basic::position::*;
 
 use serde::{Deserialize, Serialize};
@@ -32,7 +32,6 @@ pub struct C2sSetBlock {
 #[derive(Default, Debug, Clone)]
 #[derive(Serialize, Deserialize)]
 pub struct C2sPlayerMove {
-    pub name: String,
     pub new_position: WorldPosition,
 }
 

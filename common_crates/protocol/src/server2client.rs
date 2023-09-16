@@ -1,7 +1,8 @@
-use basic::block::BlockState;
+use block::BlockState;
 use basic::position::*;
 
 use serde::{Deserialize, Serialize};
+use world::chunk::Chunk;
 
 #[derive(PartialOrd, PartialEq)]
 #[derive(Debug, Clone)]
@@ -11,6 +12,7 @@ pub enum Server2ClientPacket {
     SetBlock(S2cSetBlock),
     ClientMoves(S2cPlayerMove),
     Message(S2cChatMessage),
+    LoadChunk(S2cLoadChunk),
 }
 
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
@@ -18,6 +20,15 @@ pub enum Server2ClientPacket {
 #[derive(Serialize, Deserialize)]
 pub struct S2cHandShake {
     pub server_name: String,
+}
+
+#[derive(Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Default, Debug, Clone, Hash)]
+#[derive(Serialize, Deserialize)]
+pub struct S2cLoadChunk {
+    // TODO
+    pub xyz: WorldBlockPosition,
+    pub chunk: Box<Chunk>,
 }
 
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
@@ -32,7 +43,7 @@ pub struct S2cSetBlock {
 #[derive(Default, Debug, Clone)]
 #[derive(Serialize, Deserialize)]
 pub struct S2cPlayerMove {
-    pub name: String,
+    pub id: u64,
     pub new_position: WorldPosition,
 }
 
