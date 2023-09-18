@@ -1,15 +1,17 @@
+include!(concat!(env!("OUT_DIR"), "/empty_column_macro_generated.rs"));
+
 use std::ops::{Index, IndexMut};
 use serde::{Deserialize, Serialize};
 use block::BlockState;
 
-use chunk::Chunk;
-use crate::chunk::PosInChunk;
-use crate::CHUNK_HEIGHT;
+pub(crate) mod chunk;
+pub(crate) mod weather;
+
+use chunk::{Chunk, PosInChunk, CHUNK_HEIGHT};
+use weather::Weather;
 
 pub const WORLD_HEIGHT_CHUNKS: usize = 32;
 pub const WORLD_HEIGHT_BLOCKS: usize = WORLD_HEIGHT_CHUNKS * CHUNK_HEIGHT;
-
-pub(crate) mod chunk;
 
 /// [Index 0](Index) gives lowest chunk in column
 /// ```rust
@@ -22,16 +24,19 @@ pub(crate) mod chunk;
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Serialize, Deserialize)]
 pub struct ColumnOfChunks {
+    weather: Weather,
     chunks: [Chunk; WORLD_HEIGHT_CHUNKS],
 }
 
 impl ColumnOfChunks {
-    pub fn empty() -> Self {
-        Self::default()
-    }
+    pub const EMPTY: ColumnOfChunks = ColumnOfChunks {
+        weather: Weather::Sunny,
+        chunks: empty_column!(),
+    };
 
     pub fn from_fn<F: FnMut(PosInColumnOfChunks) -> BlockState>(mut pos_in_chunk_column_to_block_state_fn: F) -> Self {
         Self {
+            weather: Weather::default(),
             chunks: std::array::from_fn(|chunk_number| {
                 Chunk::from_fn(|pos_in_chunk| {
                     pos_in_chunk_column_to_block_state_fn(
@@ -44,6 +49,7 @@ impl ColumnOfChunks {
 
     pub fn from_fn_chunk<F: FnMut(usize) -> Chunk>(mut chunk_number_to_chunk_fn: F) -> Self {
         Self {
+            weather: Default::default(),
             chunks: std::array::from_fn(|chunk_number| {
                 chunk_number_to_chunk_fn(chunk_number)
             }),
@@ -100,6 +106,7 @@ impl PosInColumnOfChunks {
     }
 }
 
+#[cfg(test)]
 mod test {
     use block::BlockState;
     use block::solid_block::{CommonBlockAttrs, SolidBlock};
@@ -109,6 +116,9 @@ mod test {
     #[test]
     fn chunk_column_test() {
         let mut chunks_column = ColumnOfChunks::default();
+
+        todo!();
+
         let lowest_block_with_lowest_xz = &mut chunks_column[0][0][(0, 0)];
 
         assert_eq!(lowest_block_with_lowest_xz, &BlockState::Air);

@@ -1,3 +1,5 @@
+include!(concat!(env!("OUT_DIR"), "/empty_layer_macro_generated.rs"));
+
 use block::BlockState;
 
 use std::ops::{Index, IndexMut};
@@ -18,16 +20,10 @@ pub const CHUNK_WIDTH: usize = 32;
 #[derive(Default, Clone, Hash, Debug)]
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Serialize, Deserialize)]
-pub struct ChunkLayer {
-    layer: [[BlockState; CHUNK_WIDTH]; CHUNK_WIDTH],
-}
+pub struct ChunkLayer([[BlockState; CHUNK_WIDTH]; CHUNK_WIDTH]);
 
 impl ChunkLayer {
-    pub const EMPTY: Self = todo!();
-
-    pub const fn new(layer: [[BlockState; CHUNK_WIDTH]; CHUNK_WIDTH]) -> Self {
-        Self { layer }
-    }
+    pub const EMPTY: Self = Self(empty_layer!());
 
     pub fn of(block_state: BlockState) -> Self {
         Self::from_fn(|_| {
@@ -36,13 +32,12 @@ impl ChunkLayer {
     }
 
     pub fn from_fn<F: FnMut(PosInLayer) -> BlockState>(mut pos_in_layer_to_block_state_fn: F) -> Self {
-        Self {
-            layer: std::array::from_fn(|x| {
-                std::array::from_fn(|z| {
-                    pos_in_layer_to_block_state_fn(PosInLayer::new(x as u8, z as u8))
-                })
-            }),
-        }
+        Self(std::array::from_fn(|x| {
+            std::array::from_fn(|z| {
+                pos_in_layer_to_block_state_fn(PosInLayer::new(x as u8, z as u8))
+            })
+        }),
+        )
     }
 }
 
@@ -64,13 +59,13 @@ impl Index<(usize, usize)> for ChunkLayer {
     type Output = BlockState;
 
     fn index(&self, xz: (usize, usize)) -> &Self::Output {
-        &self.layer[xz.0][xz.1]
+        &self.0[xz.0][xz.1]
     }
 }
 
 impl IndexMut<(usize, usize)> for ChunkLayer {
     fn index_mut(&mut self, xz: (usize, usize)) -> &mut Self::Output {
-        &mut self.layer[xz.0][xz.1]
+        &mut self.0[xz.0][xz.1]
     }
 }
 
@@ -99,6 +94,7 @@ impl PosInLayer {
     }
 }
 
+#[cfg(test)]
 mod test {
     use block::BlockState;
     use block::solid_block::{CommonBlockAttrs, SolidBlock};

@@ -5,10 +5,10 @@ pub mod liquid_item;
 pub mod fancy_item;
 pub mod super_fancy_item;
 
-use solid_item::SolidBlockItem;
-use fancy_item::FancyBlockItem;
-use liquid_item::LiquidBlockItem;
-use super_fancy_item::SuperFancyBlockItem;
+pub use solid_item::SolidBlockItem;
+pub use fancy_item::FancyBlockItem;
+pub use liquid_item::LiquidBlockItem;
+pub use super_fancy_item::SuperFancyBlockItem;
 
 #[derive(Clone, Hash, Debug)]
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
@@ -34,6 +34,10 @@ impl Default for Item {
     fn default() -> Self {
         Self::Block(SolidBlockItem::default())
     }
+}
+
+pub trait MaxCount {
+    fn max_count(&self) -> u16;
 }
 
 #[derive(Default, Clone, Hash, Debug)]

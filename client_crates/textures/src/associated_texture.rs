@@ -18,7 +18,7 @@ impl AssociatedTexture for Item {
             Item::Fancy(fancy) => fancy.texture_path(),
             Item::SuperFancy(super_fancy) => super_fancy.texture_path(),
             Item::Instrument(inst) =>
-                Some(format!("instrument/{:?}.png", inst).to_pascal_case().into_boxed_str()),
+                Some(format!("instrument/{:?}.png", inst).to_snake_case().into_boxed_str()),
         }
     }
 }
@@ -47,6 +47,7 @@ impl AssociatedTexture for SuperFancyBlockItem {
     }
 }
 
+#[cfg(test)]
 mod test {
     use item::solid_item::SolidBlockItem;
     use crate::AssociatedTexture;

@@ -1,3 +1,5 @@
+include!(concat!(env!("OUT_DIR"), "/empty_chunk_macro_generated.rs"));
+
 pub mod biome;
 
 mod layer;
@@ -31,6 +33,11 @@ pub struct Chunk {
 }
 
 impl Chunk {
+    pub const EMPTY: Self = Self {
+        biome: Biome::Void,
+        layers: empty_chunk!(),
+    };
+
     pub fn of(block_state: BlockState) -> Self {
         Self::from_fn(|_| block_state.clone())
     }
@@ -129,6 +136,7 @@ impl PosInChunk {
     }
 }
 
+#[cfg(test)]
 mod test {
     use block::BlockState;
     use block::solid_block::CommonBlockAttrs;

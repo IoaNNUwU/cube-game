@@ -4,6 +4,7 @@ use block_item::torch::{Brightness, TorchType};
 
 #[cfg(feature = "derive-display")]
 use strum::Display;
+use crate::MaxCount;
 
 #[cfg_attr(feature = "derive-display", derive(Display))]
 #[derive(Clone, Hash, Debug)]
@@ -11,6 +12,12 @@ use strum::Display;
 #[derive(Serialize, Deserialize, EnumIter)]
 pub enum FancyBlockItem {
     Torch(TorchAttrs),
+}
+
+impl MaxCount for FancyBlockItem {
+    fn max_count(&self) -> u16 {
+        99
+    }
 }
 
 #[derive(Default, Clone, Hash, Debug)]

@@ -14,7 +14,7 @@ pub enum SolidBlock {
     StoneBricks(CommonBlockAttrs),
     UnbreakableStone,
     PlainsGrass(CommonBlockAttrs),
-    PlainsLog(LogBlockAttrs),
+    PlainsLog(CommonBlockAttrs, LogBlockAttrs),
     PlainsLeaves,
 }
 
