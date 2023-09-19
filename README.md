@@ -1,7 +1,23 @@
-## Cube Game in Rust Language
+## Cube Game
 
-Minecraft-like game which aims to overtake the original one 
-by adding new mechanics, bosses and RPG elements inspired by terraria.
+Minecraft-like game which aims to overtake the original one by adding new mechanics, bosses and RPG elements inspired by terraria.
+
+- Uses __Rust🦀__ & __Bevy Engine🐦__
+
+## Cube Game is early in development!🛠️
+
+- [X] Client/Server protocol:atom:
+- [ ] Infinite server world (even height is unlimited) with __cubic chunks__ based world♾️
+- [ ] Client world with simple graphics🧊
+- [ ] Player Inventory & Block inventories👩‍🦲
+- [ ] Instruments⛏️
+- [ ] Creatures🐷
+- [ ] Monsters🧟
+- [ ] Procedural biomes which can change depending on blocks placed⏳
+- [ ] Procedural generation🌳
+- [ ] Multiple dungeons🏰
+
+### Cool graph 🥇
 
 ![degraph](https://github.com/IoaNNUwU/cube-game/blob/main/depgraph.png)
 
