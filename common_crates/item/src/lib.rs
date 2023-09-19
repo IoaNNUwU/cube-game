@@ -18,6 +18,16 @@ pub struct ItemStack {
     pub count: u16,
 }
 
+impl Default for ItemStack {
+    fn default() -> Self {
+        let default_item = Item::default();
+        Self {
+            count: default_item.max_count(),
+            item: default_item,
+        }
+    }
+}
+
 #[derive(Clone, Hash, Debug)]
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Serialize, Deserialize)]
@@ -28,6 +38,19 @@ pub enum Item {
     Fancy(FancyBlockItem),
     SuperFancy(SuperFancyBlockItem),
     Instrument(SwordAttrs),
+}
+
+impl MaxCount for Item {
+    fn max_count(&self) -> u16 {
+        match self {
+            Item::None => 0,
+            Item::Block(block) => block.max_count(),
+            Item::Liquid(liquid) => liquid.max_count(),
+            Item::Fancy(fancy) => fancy.max_count(),
+            Item::SuperFancy(super_fancy) => super_fancy.max_count(),
+            Item::Instrument(_) => 1,
+        }
+    }
 }
 
 impl Default for Item {

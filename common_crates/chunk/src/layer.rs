@@ -12,7 +12,7 @@ pub const CHUNK_WIDTH: usize = 32;
 /// [Index (0, 0)](Index) returns block state with lowest xz in that chunks_column
 /// ```rust
 /// use block::BlockState;
-/// use world::chunk::ChunkLayer;
+/// use chunk::ChunkLayer;
 ///
 /// let layer = ChunkLayer::default();
 /// let block_at_lowest_xz = &layer[(0, 0)];

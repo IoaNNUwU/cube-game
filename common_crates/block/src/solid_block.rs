@@ -56,39 +56,50 @@ pub enum Transformation {
     Wall(WallAttrs),
 }
 
-#[derive(Default, Clone, Hash, Debug)]
+#[derive(Clone, Hash, Debug)]
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Serialize, Deserialize)]
 pub enum HalfBlockTransformation {
-    #[default]
     DownHalfSolid,
     UpperHalfSolid,
-    NorthHalfSolid,
-    SouthHalfSolid,
-    EastHalfSolid,
-    WestHalfSolid,
+    PositiveXHalfSolid,
+    NegativeXHalfSolid,
+    PositiveZHalfSolid,
+    NegativeZHalfSolid,
 }
 
-#[derive(Default, Clone, Hash, Debug)]
+#[derive(Clone, Hash, Debug)]
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Serialize, Deserialize)]
 pub enum StairsTransformation {
-    #[default]
-    LowerNorth,
-    LowerSouth,
-    LowerEast,
-    LowerWest,
-    FlippedLowerNorth,
-    FlippedLowerSouth,
-    FlippedLowerEast,
-    FlippedLowerWest,
+    Normal(StairsDirection),
+    Flipped(StairsDirection),
 }
 
-#[derive(Default, Clone, Hash, Debug)]
+#[derive(Clone, Hash, Debug)]
+#[derive(Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Serialize, Deserialize)]
+pub enum StairsDirection {
+    EmptyPartTowardsPositiveX,
+    EmptyPartTowardsNegativeX,
+    EmptyPartTowardsPositiveZ,
+    EmptyPartTowardsNegativeZ,
+
+    EmptyBitTowardsPosXPosZ,
+    EmptyBitTowardsNegXNegZ,
+    EmptyBitTowardsNegXPosZ,
+    EmptyBitTowardsPosXNegZ,
+
+    FilledBitTowardsPosXPosZ,
+    FilledBitTowardsNegXNegZ,
+    FilledBitTowardsNegXPosZ,
+    FilledBitTowardsPosXNegZ,
+}
+
+#[derive(Clone, Hash, Debug)]
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Serialize, Deserialize)]
 pub enum TorchTransformation {
-    #[default]
     OnNorthWall,
     OnSouthWall,
     OnEastWall,
@@ -113,7 +124,7 @@ pub struct WallAttrs {
     pub positive_z: Connection,
     pub negative_x: Connection,
     pub negative_z: Connection,
-    pub positive_y: Connection,
+    pub upper: Connection,
 }
 
 #[derive(Default, Clone, Hash, Debug)]

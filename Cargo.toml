@@ -23,6 +23,7 @@ members = ["client_crates/*", "server_crates/*", "common_crates/*", "test_crates
 # Common crates
 basic = { path = "common_crates/basic" }
 block = { path = "common_crates/block" }
+chunk = { path = "common_crates/chunk" }
 item = { path = "common_crates/item" }
 block_item = { path = "common_crates/block_item" }
 world = { path = "common_crates/world" }

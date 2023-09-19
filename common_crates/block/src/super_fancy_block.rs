@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_with::serde_as;
 use strum::EnumIter;
+use item::ItemStack;
 
 #[cfg(feature = "derive-display")]
 use strum::Display;
@@ -25,7 +26,7 @@ impl Default for ChestAttr {
     fn default() -> Self {
         Self {
             inventory: ItemStorage {
-                items: std::array::from_fn(|_| std::array::from_fn(|_| Item)),
+                items: std::array::from_fn(|_| std::array::from_fn(|_| ItemStack::default())),
             },
         }
     }
@@ -37,13 +38,8 @@ impl Default for ChestAttr {
 #[derive(Serialize, Deserialize)]
 pub struct ItemStorage<const COLUMNS: usize, const ROWS: usize> {
     #[serde_as(as = "[[_; COLUMNS]; ROWS]")]
-    items: [[Item; COLUMNS]; ROWS],
+    items: [[ItemStack; COLUMNS]; ROWS],
 }
-
-#[derive(Default, Clone, Hash, Debug)]
-#[derive(Ord, PartialOrd, Eq, PartialEq)]
-#[derive(Serialize, Deserialize)]
-pub struct Item;
 
 #[derive(Clone, Hash, Debug)]
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
@@ -56,7 +52,7 @@ impl Default for CraftingTableAttr {
     fn default() -> Self {
         Self {
             inv: ItemStorage {
-                items: std::array::from_fn(|_| std::array::from_fn(|_| Item)),
+                items: std::array::from_fn(|_| std::array::from_fn(|_| ItemStack::default())),
             },
         }
     }

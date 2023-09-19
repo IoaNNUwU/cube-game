@@ -1,3 +1,4 @@
+extern crate core;
 include!(concat!(env!("OUT_DIR"), "/solid_macro_generated.rs"));
 
 use serde::{Deserialize, Serialize};

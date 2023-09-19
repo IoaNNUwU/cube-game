@@ -28,7 +28,7 @@ pub const WORLD_WIDTH_BLOCKS: usize = WORLD_WIDTH_CHUNKS * CHUNK_WIDTH;
 #[derive(Default, Clone, Debug)]
 #[derive(Eq, PartialEq)]
 #[derive(Serialize, Deserialize)]
-pub struct World(HashMap<ChunkPosInWorld, ColumnOfChunks>);
+pub struct World(HashMap<ChunkPosInWorld, Entity>);
 
 impl Index<ChunkPosInWorld> for World {
     type Output = ColumnOfChunks;
