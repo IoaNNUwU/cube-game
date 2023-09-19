@@ -55,6 +55,22 @@ impl ColumnOfChunks {
             }),
         }
     }
+
+    pub fn block_at(&self, column_x: u8, column_y: u16, column_z: u8) -> &BlockState {
+        &self[PosInColumnOfChunks {
+            x: column_x,
+            y: column_y,
+            z: column_z,
+        }]
+    }
+
+    pub fn block_at_mut(&mut self, column_x: u8, column_y: u16, column_z: u8) -> &mut BlockState {
+        &mut self[PosInColumnOfChunks {
+            x: column_x,
+            y: column_y,
+            z: column_z,
+        }]
+    }
 }
 
 impl Index<usize> for ColumnOfChunks {
@@ -76,6 +92,13 @@ impl Index<PosInColumnOfChunks> for ColumnOfChunks {
 
     fn index(&self, pos_in_column: PosInColumnOfChunks) -> &Self::Output {
         &self.chunks[pos_in_column.chunk_number()][pos_in_column.as_pos_in_chunk()]
+    }
+}
+
+impl IndexMut<PosInColumnOfChunks> for ColumnOfChunks {
+
+    fn index_mut(&mut self, pos_in_column: PosInColumnOfChunks) -> &mut Self::Output {
+        &mut self.chunks[pos_in_column.chunk_number()][pos_in_column.as_pos_in_chunk()]
     }
 }
 

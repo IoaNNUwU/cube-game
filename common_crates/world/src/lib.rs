@@ -1,5 +1,4 @@
-#![feature(inline_const)]
-
+use std::collections::hash_map::Entry;
 pub use chunk::CHUNK_WIDTH;
 pub use chunk::CHUNK_HEIGHT;
 
@@ -20,6 +19,7 @@ pub mod chunk {
 pub mod replace;
 
 use std::collections::HashMap;
+use std::ops::{Index, IndexMut};
 use serde::{Deserialize, Serialize};
 
 pub const WORLD_WIDTH_CHUNKS: usize = 3_000_000;
@@ -28,8 +28,20 @@ pub const WORLD_WIDTH_BLOCKS: usize = WORLD_WIDTH_CHUNKS * CHUNK_WIDTH;
 #[derive(Default, Clone, Debug)]
 #[derive(Eq, PartialEq)]
 #[derive(Serialize, Deserialize)]
-pub struct World {
-    pub map: HashMap<ChunkPosInWorld, ColumnOfChunks>
+pub struct World(HashMap<ChunkPosInWorld, ColumnOfChunks>);
+
+impl Index<ChunkPosInWorld> for World {
+    type Output = ColumnOfChunks;
+
+    fn index(&self, index: ChunkPosInWorld) -> &Self::Output {
+        &self.0[&index]
+    }
+}
+
+impl IndexMut<ChunkPosInWorld> for World {
+    fn index_mut(&mut self, index: ChunkPosInWorld) -> &mut Self::Output {
+        self.0.entry(index).or_default()
+    }
 }
 
 #[derive(Default, Clone, Hash, Debug)]

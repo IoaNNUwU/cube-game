@@ -1,55 +1,77 @@
+use bevy::math::Quat;
 use block::BlockState;
 use basic::position::*;
 
 use serde::{Deserialize, Serialize};
 use world::chunk::Chunk;
+use world::ColumnOfChunks;
 
-#[derive(PartialOrd, PartialEq)]
 #[derive(Debug, Clone)]
 #[derive(Serialize, Deserialize)]
 pub enum Server2ClientPacket {
-    HandShake(S2cHandShake),
-    SetBlock(S2cSetBlock),
+    Ping(S2CPing),
+
+    AllowJoin,
+    Kick(S2CKick),
+
+    PlaceBlock(S2CPlaceBlock),
+    PlaceChunk(S2CPlaceChunk),
+    PlaceColumn(S2CPlaceChunkColumn),
+
     ClientMoves(S2cPlayerMove),
-    Message(S2cChatMessage),
-    LoadChunk(S2cLoadChunk),
+
+    Message(C2CChatMessage),
 }
 
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Default, Debug, Clone, Hash)]
 #[derive(Serialize, Deserialize)]
-pub struct S2cHandShake {
+pub struct S2CPing {
     pub server_name: String,
 }
 
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Default, Debug, Clone, Hash)]
 #[derive(Serialize, Deserialize)]
-pub struct S2cLoadChunk {
-    // TODO
-    pub xyz: WorldBlockPosition,
-    pub chunk: Box<Chunk>,
+pub struct S2CKick {
+    pub reason: String,
 }
 
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Default, Debug, Clone, Hash)]
 #[derive(Serialize, Deserialize)]
-pub struct S2cSetBlock {
+pub struct S2CPlaceBlock {
     pub block_state: BlockState,
     pub position: WorldBlockPosition,
 }
 
-#[derive(PartialOrd, PartialEq)]
-#[derive(Default, Debug, Clone)]
+#[derive(Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Default, Debug, Clone, Hash)]
 #[derive(Serialize, Deserialize)]
-pub struct S2cPlayerMove {
-    pub id: u64,
-    pub new_position: WorldPosition,
+pub struct S2CPlaceChunk {
+    pub column: Box<Chunk>,
+    pub position: WorldBlockPosition,
 }
 
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Default, Debug, Clone, Hash)]
 #[derive(Serialize, Deserialize)]
-pub struct S2cChatMessage {
+pub struct S2CPlaceChunkColumn {
+    pub column: Box<ColumnOfChunks>,
+    pub position: WorldBlockPosition,
+}
+
+#[derive(Default, Debug, Clone)]
+#[derive(Serialize, Deserialize)]
+pub struct S2cPlayerMove {
+    pub id: u64,
+    pub world_pos: WorldPosition,
+    pub rotation: Quat,
+}
+
+#[derive(Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Default, Debug, Clone, Hash)]
+#[derive(Serialize, Deserialize)]
+pub struct C2CChatMessage {
     pub message: String,
 }

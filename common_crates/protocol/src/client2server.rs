@@ -1,43 +1,49 @@
+use bevy::prelude::{Quat, Transform};
 use block::BlockState;
 use basic::position::*;
 
 use serde::{Deserialize, Serialize};
 
-#[derive(PartialOrd, PartialEq)]
 #[derive(Debug, Clone)]
 #[derive(Serialize, Deserialize)]
 pub enum Client2ServerPacket {
-    HandShake(C2sHandShake),
-    SetBlock(C2sSetBlock),
-    ClientMoves(C2sPlayerMove),
-    Message(C2sChatMessage),
+    Ping,
+    
+    Connect(C2SConnect),
+    Disconnect,
+    
+    PlaceBlock(C2SPlaceBlock),
+    
+    ClientMoves(C2SPlayerMove),
+    
+    Message(C2SChatMessage),
 }
 
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Default, Debug, Clone, Hash)]
 #[derive(Serialize, Deserialize)]
-pub struct C2sHandShake {
+pub struct C2SConnect {
     pub player_name: String,
 }
 
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Default, Debug, Clone, Hash)]
 #[derive(Serialize, Deserialize)]
-pub struct C2sSetBlock {
+pub struct C2SPlaceBlock {
     pub block_state: BlockState,
     pub position: WorldBlockPosition,
 }
 
-#[derive(PartialOrd, PartialEq)]
 #[derive(Default, Debug, Clone)]
 #[derive(Serialize, Deserialize)]
-pub struct C2sPlayerMove {
-    pub new_position: WorldPosition,
+pub struct C2SPlayerMove {
+    pub world_pos: WorldPosition,
+    pub rotation: Quat,
 }
 
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Default, Debug, Clone, Hash)]
 #[derive(Serialize, Deserialize)]
-pub struct C2sChatMessage {
+pub struct C2SChatMessage {
     pub message: String,
 }

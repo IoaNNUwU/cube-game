@@ -61,6 +61,14 @@ impl Chunk {
             }),
         }
     }
+    
+    pub fn block_at(&self, chunk_x: usize, chunk_y: usize, chunk_z: usize) -> &BlockState {
+        &self.layers[chunk_y][(chunk_x, chunk_z)]
+    }
+
+    pub fn block_at_mut(&mut self, chunk_x: usize, chunk_y: usize, chunk_z: usize) -> &mut BlockState {
+        &mut self.layers[chunk_y][(chunk_x, chunk_z)]
+    }
 }
 
 impl Index<PosInChunk> for Chunk {
