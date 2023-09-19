@@ -10,10 +10,10 @@ license.workspace = true
 [dependencies]
 # External crates
 serde_json = "1.0.104"
-bevy = { workspace = true, features = ["serialize"]}
+math.workspace = true
 serde.workspace = true
 
 # Common crates
 basic.workspace = true
 block.workspace = true
-world.workspace = true
+chunk.workspace = true

@@ -26,9 +26,10 @@ block = { path = "common_crates/block" }
 chunk = { path = "common_crates/chunk" }
 item = { path = "common_crates/item" }
 block_item = { path = "common_crates/block_item" }
-world = { path = "common_crates/world" }
+common_world = { path = "common_crates/common_world" }
 protocol = { path = "common_crates/protocol" }
 common_network = { path = "common_crates/common_network" }
+math = { path = "common_crates/math" }
 
 # Client crates
 textures = { path = "client_crates/textures" }
@@ -41,15 +42,15 @@ client_gameplay = { path = "client_crates/client_gameplay" }
 
 # Server crates
 server_network = { path = "server_crates/server_network" }
+server_world = { path = "server_crates/server_world" }
 server_gameplay = { path = "server_crates/server_gameplay" }
 
 # External crates
 serde = { version = "1.0.183", features = ["derive"] }
-bevy_renet = "0.0.9"
 bevy = "0.11.0"
 strum = { version = "0.25", features = ["derive"] }
-serde_with = "3.3.0"
 heck = "0.5.0-rc.1"
+serde_with = "3.3.0"
 
 [[bin]]
 name = "client"

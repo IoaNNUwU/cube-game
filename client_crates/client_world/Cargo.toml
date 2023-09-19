@@ -9,3 +9,4 @@ license.workspace = true
 
 [dependencies]
 bevy.workspace = true
+common_world.workspace = true

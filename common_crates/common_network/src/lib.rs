@@ -1,5 +1,38 @@
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 
+#[cfg(feature = "server")]
+mod server {
+    pub use bevy_renet::RenetServerPlugin;
+    pub use bevy_renet::transport::NetcodeServerPlugin;
+    pub use bevy_renet::renet::RenetServer;
+}
+
+#[cfg(feature = "server")]
+pub use server::*;
+
+#[cfg(feature = "client")]
+mod client {
+    pub use bevy_renet::RenetClientPlugin;
+    pub use bevy_renet::transport::NetcodeClientPlugin;
+    pub use bevy_renet::renet::RenetClient;
+
+    pub use bevy_renet::transport::{
+        client_connected,
+        client_connecting,
+        client_diconnected,
+        client_just_connected,
+        client_just_diconnected,
+    };
+}
+
+#[cfg(feature = "client")]
+pub use client::*;
+
+pub use bevy_renet::renet::{
+    Bytes, ChannelConfig, DefaultChannel, SendType, ChannelError,
+    ClientNotFound, DisconnectReason, ConnectionConfig, NetworkInfo,
+};
+
 pub const DEFAULT_SERVER_ADDRESS: SocketAddr = local_host(25344);
 pub const DEFAULT_CLIENT_BIND_ADDRESS: SocketAddr = local_host(25343);
 

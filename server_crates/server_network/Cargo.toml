@@ -9,6 +9,5 @@ license.workspace = true
 
 [dependencies]
 bevy.workspace = true
-bevy_renet.workspace = true
 common_network.workspace = true
 protocol.workspace = true

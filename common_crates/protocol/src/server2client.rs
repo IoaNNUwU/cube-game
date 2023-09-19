@@ -1,10 +1,9 @@
-use bevy::math::Quat;
+use math::Quat;
 use block::BlockState;
 use basic::position::*;
 
 use serde::{Deserialize, Serialize};
-use world::chunk::Chunk;
-use world::ColumnOfChunks;
+use chunk::Chunk;
 
 #[derive(Debug, Clone)]
 #[derive(Serialize, Deserialize)]
@@ -16,7 +15,6 @@ pub enum Server2ClientPacket {
 
     PlaceBlock(S2CPlaceBlock),
     PlaceChunk(S2CPlaceChunk),
-    PlaceColumn(S2CPlaceChunkColumn),
 
     ClientMoves(S2cPlayerMove),
 
@@ -50,14 +48,6 @@ pub struct S2CPlaceBlock {
 #[derive(Serialize, Deserialize)]
 pub struct S2CPlaceChunk {
     pub column: Box<Chunk>,
-    pub position: WorldBlockPosition,
-}
-
-#[derive(Ord, PartialOrd, Eq, PartialEq)]
-#[derive(Default, Debug, Clone, Hash)]
-#[derive(Serialize, Deserialize)]
-pub struct S2CPlaceChunkColumn {
-    pub column: Box<ColumnOfChunks>,
     pub position: WorldBlockPosition,
 }
 

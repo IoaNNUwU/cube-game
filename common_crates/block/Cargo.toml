@@ -11,8 +11,8 @@ license.workspace = true
 block_item.workspace = true
 item.workspace = true
 
-serde.workspace = true
 serde_with.workspace = true
+serde.workspace = true
 strum.workspace = true
 
 [features]

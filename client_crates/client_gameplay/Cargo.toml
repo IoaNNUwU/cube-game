@@ -11,6 +11,7 @@ license.workspace = true
 # Client crates
 client_state.workspace = true
 camera.workspace = true
+client_world.workspace = true
 
 # External crates
 bevy.workspace = true
