@@ -8,14 +8,15 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize)]
 pub enum Client2ServerPacket {
     Ping,
-    
+
     Connect(C2SConnect),
-    Disconnect,
-    
+
+    Disconnect(C2SDisconnect),
+
     PlaceBlock(C2SPlaceBlock),
-    
+
     ClientMoves(C2SPlayerMove),
-    
+
     Message(C2SChatMessage),
 }
 
@@ -24,6 +25,13 @@ pub enum Client2ServerPacket {
 #[derive(Serialize, Deserialize)]
 pub struct C2SConnect {
     pub player_name: String,
+}
+
+#[derive(Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Default, Debug, Clone, Hash)]
+#[derive(Serialize, Deserialize)]
+pub struct C2SDisconnect {
+    pub reason: String,
 }
 
 #[derive(Ord, PartialOrd, Eq, PartialEq)]

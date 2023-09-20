@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use bevy::DefaultPlugins;
-use client_network::{ClientNetworkPlugin, ReceivePacketsFromServerQueue, SendPacketsToServerQueue};
+use client_network::{ClientNetworkPlugin, IncomingS2CPacketsQueue, SendC2SPacketQueue};
 use client_state::ClientStatePlugin;
 use client_gameplay::ClientGameplayPlugin;
 use protocol::client2server::{C2SConnect, Client2ServerPacket};
@@ -30,8 +30,8 @@ pub fn run_client() {
 }
 
 fn answer_handshake(
-    mut s2c_queue: ResMut<ReceivePacketsFromServerQueue>,
-    mut c2s_queue: ResMut<SendPacketsToServerQueue>,
+    mut s2c_queue: ResMut<IncomingS2CPacketsQueue>,
+    mut c2s_queue: ResMut<SendC2SPacketQueue>,
 ) {
     for packet in s2c_queue.incoming_packets() {
         if let Server2ClientPacket::Ping(packet) = packet {

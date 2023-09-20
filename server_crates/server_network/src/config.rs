@@ -1,7 +1,7 @@
 use std::net::{SocketAddr, UdpSocket};
 use std::time::SystemTime;
-use bevy_renet::renet::{ConnectionConfig, RenetServer};
-use bevy_renet::renet::transport::{NetcodeServerTransport, ServerAuthentication, ServerConfig};
+use common_network::{ConnectionConfig, RenetServer};
+use common_network::transport::{NetcodeServerTransport, ServerAuthentication, ServerConfig};
 use common_network::DEFAULT_SERVER_ADDRESS;
 use protocol::PROTOCOL_VERSION;
 
@@ -11,7 +11,7 @@ pub fn config_server(public_addr: Option<SocketAddr>) -> (RenetServer, NetcodeSe
     let public_addr = public_addr.unwrap_or(DEFAULT_SERVER_ADDRESS);
 
     let socket = UdpSocket::bind(public_addr)
-        .expect(&format!("Unable to bind UdpSocket to {}", public_addr));
+        .unwrap_or_else(|_| panic!("Unable to bind UdpSocket to {}", public_addr));
 
     let current_time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap();
 
@@ -26,7 +26,7 @@ pub fn config_server(public_addr: Option<SocketAddr>) -> (RenetServer, NetcodeSe
         current_time,
         server_config,
         socket,
-    ).expect(&format!("Unable to create transport"));
+    ).unwrap_or_else(|_| panic!("Unable to create transport"));
 
     (server, transport)
 }

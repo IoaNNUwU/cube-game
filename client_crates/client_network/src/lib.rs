@@ -1,8 +1,8 @@
 use std::collections::VecDeque;
 use bevy::prelude::*;
-use bevy_renet::RenetClientPlugin;
-use bevy_renet::renet::{DefaultChannel, RenetClient};
-use bevy_renet::transport::NetcodeClientPlugin;
+use common_network::RenetClientPlugin;
+use common_network::{DefaultChannel, RenetClient};
+use common_network::NetcodeClientPlugin;
 use protocol::client2server::Client2ServerPacket;
 use protocol::server2client::Server2ClientPacket;
 
@@ -15,8 +15,8 @@ impl Plugin for ClientNetworkPlugin {
         let (client, transport) = config::config_client(None, None);
 
         app
-            .init_resource::<ReceivePacketsFromServerQueue>()
-            .init_resource::<SendPacketsToServerQueue>()
+            .init_resource::<IncomingS2CPacketsQueue>()
+            .init_resource::<SendC2SPacketQueue>()
 
             .insert_resource(client)
             .insert_resource(transport)
@@ -37,13 +37,13 @@ impl Plugin for ClientNetworkPlugin {
 const CHANNEL: DefaultChannel = DefaultChannel::ReliableOrdered;
 
 #[derive(Default, Resource)]
-pub struct ReceivePacketsFromServerQueue {
-    coming_from_server_queue: VecDeque<Server2ClientPacket>,
+pub struct IncomingS2CPacketsQueue {
+    coming_from_server_queue: Vec<Server2ClientPacket>,
 }
 
-impl ReceivePacketsFromServerQueue {
+impl IncomingS2CPacketsQueue {
     pub fn receive(&mut self) -> Option<Server2ClientPacket> {
-        self.coming_from_server_queue.pop_back()
+        self.coming_from_server_queue.pop()
     }
 
     pub fn incoming_packets(&mut self) -> impl Iterator<Item = Server2ClientPacket> + '_ {
@@ -51,7 +51,7 @@ impl ReceivePacketsFromServerQueue {
     }
 }
 
-impl Iterator for ReceivePacketsFromServerQueue {
+impl Iterator for IncomingS2CPacketsQueue {
     type Item = Server2ClientPacket;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -61,21 +61,21 @@ impl Iterator for ReceivePacketsFromServerQueue {
 
 fn add_s2c_packets_to_queue_on_message_from_server(
     mut renet_client: ResMut<RenetClient>,
-    mut incoming_packets_queue: ResMut<ReceivePacketsFromServerQueue>,
+    mut incoming_packets_queue: ResMut<IncomingS2CPacketsQueue>,
 ) {
     while let Some(packet) = renet_client.receive_message(CHANNEL) {
         if let Ok(packet) = protocol::deserialize::<Server2ClientPacket>(packet.as_ref()) {
-            incoming_packets_queue.coming_from_server_queue.push_back(packet);
+            incoming_packets_queue.coming_from_server_queue.push(packet);
         };
     }
 }
 
 #[derive(Default, Resource)]
-pub struct SendPacketsToServerQueue {
+pub struct SendC2SPacketQueue {
     send_to_server_queue: VecDeque<Client2ServerPacket>,
 }
 
-impl SendPacketsToServerQueue {
+impl SendC2SPacketQueue {
     pub fn send(&mut self, packet: Client2ServerPacket) {
         self.send_to_server_queue.push_front(packet)
     }
@@ -83,7 +83,7 @@ impl SendPacketsToServerQueue {
 
 fn send_c2s_packets_from_queue(
     mut renet_client: ResMut<RenetClient>,
-    mut send_packets_queue: ResMut<SendPacketsToServerQueue>,
+    mut send_packets_queue: ResMut<SendC2SPacketQueue>,
 ) {
     while let Some(packet) = send_packets_queue.send_to_server_queue.pop_back() {
         let message = protocol::serialize(&packet);

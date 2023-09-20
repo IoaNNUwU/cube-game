@@ -9,5 +9,5 @@ license.workspace = true
 
 [dependencies]
 bevy.workspace = true
-common_network.workspace = true
+common_network = { workspace = true, features = ["client"] }
 protocol.workspace = true

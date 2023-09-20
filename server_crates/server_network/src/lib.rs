@@ -1,10 +1,12 @@
 use std::collections::VecDeque;
+use std::ops::Deref;
 use bevy::prelude::*;
 
-use bevy_renet::renet::{DefaultChannel, RenetServer};
-use bevy_renet::RenetServerPlugin;
-use bevy_renet::transport::NetcodeServerPlugin;
-use protocol::client2server::Client2ServerPacket;
+use common_network::{DefaultChannel, RenetServer, ServerEvent};
+use common_network::RenetServerPlugin;
+use common_network::NetcodeServerPlugin;
+
+use protocol::client2server::{C2SDisconnect, Client2ServerPacket};
 use protocol::server2client::Server2ClientPacket;
 
 mod config;
@@ -28,6 +30,7 @@ impl Plugin for ServerNetworkPlugin {
             ))
             .add_systems(PreUpdate, (
                 add_c2s_packet_to_queue_on_message_from_client,
+                add_connect_and_disconnect_message_to_queue_on_server_event,
             ))
             .add_systems(PostUpdate, (
                 send_s2c_packets_from_queue,
@@ -39,16 +42,21 @@ const CHANNEL: DefaultChannel = DefaultChannel::ReliableOrdered;
 
 #[derive(Default, Resource)]
 pub struct IncomingC2SPacketsQueue {
-    coming_from_clients_queue: VecDeque<Client2ServerMessage>,
+    coming_from_clients_queue: Vec<Client2ServerMessage>,
 }
 
 impl IncomingC2SPacketsQueue {
     pub fn receive(&mut self) -> Option<Client2ServerMessage> {
-        self.coming_from_clients_queue.pop_back()
+        self.coming_from_clients_queue.pop()
     }
 
     pub fn incoming_packets(&mut self) -> impl Iterator<Item=Client2ServerMessage> + '_ {
         self.into_iter()
+    }
+
+    /// private
+    fn push(&mut self, message: Client2ServerMessage) {
+        self.coming_from_clients_queue.push(message);
     }
 }
 
@@ -61,7 +69,7 @@ impl Iterator for IncomingC2SPacketsQueue {
 }
 
 pub struct Client2ServerMessage {
-    pub id: u64,
+    pub client_id: u64,
     pub packet: Client2ServerPacket,
 }
 
@@ -72,8 +80,34 @@ fn add_c2s_packet_to_queue_on_message_from_client(
     for id in renet_server.clients_id() {
         while let Some(packet) = renet_server.receive_message(id, CHANNEL) {
             if let Ok(packet) = protocol::deserialize::<Client2ServerPacket>(packet.as_ref()) {
-                let message = Client2ServerMessage { id, packet };
-                clients2server_connection.coming_from_clients_queue.push_back(message);
+                let message = Client2ServerMessage { client_id: id, packet };
+                clients2server_connection.push(message);
+            }
+        }
+    }
+}
+
+fn add_connect_and_disconnect_message_to_queue_on_server_event(
+    mut server_events: EventReader<ServerEvent>,
+    mut clients2server_connection: ResMut<IncomingC2SPacketsQueue>,
+) {
+    for event in server_events.iter() {
+        match event {
+            ServerEvent::ClientConnected { client_id } => {
+                let message = Client2ServerMessage {
+                    client_id: *client_id,
+                    packet: Client2ServerPacket::Ping,
+                };
+                clients2server_connection.push(message);
+            },
+            ServerEvent::ClientDisconnected { client_id, reason } => {
+                let message = Client2ServerMessage {
+                    client_id: *client_id,
+                    packet: Client2ServerPacket::Disconnect(C2SDisconnect {
+                        reason: reason.to_string(),
+                    })
+                };
+                clients2server_connection.push(message);
             }
         }
     }
@@ -81,13 +115,17 @@ fn add_c2s_packet_to_queue_on_message_from_client(
 
 #[derive(Default, Resource)]
 pub struct SendS2CPacketsQueue {
-    send_to_clients_queue: VecDeque<Server2ClientMessage>,
+    send_to_clients_queue: Vec<Server2ClientMessage>,
     send_all_queue: VecDeque<Server2ClientPacket>,
 }
 
 impl SendS2CPacketsQueue {
     pub fn send(&mut self, message: Server2ClientMessage) {
-        self.send_to_clients_queue.push_back(message);
+        self.send_to_clients_queue.push(message);
+    }
+
+    pub fn send_to(&mut self, client_id: u64, packet: Server2ClientPacket) {
+        self.send_to_clients_queue.push(Server2ClientMessage { client_id, packet });
     }
 
     pub fn send_all(&mut self, packet: Server2ClientPacket) {
@@ -104,7 +142,7 @@ fn send_s2c_packets_from_queue(
     mut renet_server: ResMut<RenetServer>,
     mut send_packets_queue: ResMut<SendS2CPacketsQueue>,
 ) {
-    while let Some(s2c_message) = send_packets_queue.send_to_clients_queue.pop_back() {
+    while let Some(s2c_message) = send_packets_queue.send_to_clients_queue.pop() {
         let message = protocol::serialize(&s2c_message.packet);
         renet_server.send_message(s2c_message.client_id, CHANNEL, message);
     }

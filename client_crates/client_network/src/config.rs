@@ -1,8 +1,8 @@
 use std::net::{SocketAddr, UdpSocket};
 use std::time::SystemTime;
 
-use bevy_renet::renet::{ConnectionConfig, RenetClient};
-use bevy_renet::renet::transport::{ClientAuthentication, NetcodeClientTransport};
+use common_network::{ConnectionConfig, RenetClient};
+use common_network::transport::{ClientAuthentication, NetcodeClientTransport};
 
 use common_network::{DEFAULT_CLIENT_BIND_ADDRESS, DEFAULT_SERVER_ADDRESS};
 

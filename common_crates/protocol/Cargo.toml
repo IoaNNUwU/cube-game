@@ -17,3 +17,4 @@ serde.workspace = true
 basic.workspace = true
 block.workspace = true
 chunk.workspace = true
+common_world.workspace = true
