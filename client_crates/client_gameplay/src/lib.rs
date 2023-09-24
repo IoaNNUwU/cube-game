@@ -1,10 +1,12 @@
 use bevy::app::{App, Update};
 use bevy::prelude::{Component, in_state, IntoSystemConfigs, OnEnter, OnExit, Plugin, Res, ResMut, Resource};
 use camera::CubeCameraPlugin;
-use client_network::{IncomingS2CPacketsQueue, SendC2SPacketQueue};
+use client_network::{IncomingS2CPacketQueue, SendC2SPacketQueue};
 use client_state::ClientState;
 use protocol::client2server::{C2SConnect, Client2ServerPacket};
 use protocol::server2client::{S2CPing, Server2ClientPacket};
+
+mod gameplay;
 
 pub struct ClientGameplayPlugin;
 
@@ -38,7 +40,7 @@ fn dummy() {}
 pub struct ClientGameplayElementMarker;
 
 fn send_connection_request_on_ping_from_server(
-    mut s2c_queue: ResMut<IncomingS2CPacketsQueue>,
+    mut s2c_queue: ResMut<IncomingS2CPacketQueue>,
     mut c2s_queue: ResMut<SendC2SPacketQueue>,
     player_name: Res<PlayerName>
 ) {
@@ -51,4 +53,8 @@ fn send_connection_request_on_ping_from_server(
             }));
         }
     }
+}
+
+fn load_menu_elements_on_allow_connect() {
+    
 }

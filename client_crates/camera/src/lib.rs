@@ -1,4 +1,3 @@
-use bevy::ecs::bundle::DynamicBundle;
 use bevy::prelude::*;
 
 pub mod controls;
@@ -17,13 +16,12 @@ pub struct CubeCameraPlugin;
 impl Plugin for CubeCameraPlugin {
 
     fn build(&self, app: &mut App) {
-
+        
     }
 }
 
 use bevy::ecs::event::{Events, ManualEventReader};
 use bevy::input::mouse::MouseMotion;
-use bevy::prelude::*;
 use bevy::window::{CursorGrabMode, PrimaryWindow};
 
 pub mod prelude {
@@ -78,11 +76,6 @@ impl Default for KeyBindings {
     }
 }
 
-/// Used in queries when you want flycams and not other cameras
-/// A marker component used in queries when you want flycams and not other cameras
-#[derive(Component)]
-pub struct FlyCam;
-
 /// Grabs/ungrabs mouse cursor
 fn toggle_grab_cursor(window: &mut Window) {
     match window.cursor.grab_mode {
@@ -113,7 +106,7 @@ fn setup_player(mut commands: Commands) {
             transform: Transform::from_xyz(-2.0, 5.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
             ..Default::default()
         },
-        FlyCam,
+        CubeCameraMarker,
     ));
 }
 
@@ -124,7 +117,7 @@ fn player_move(
     primary_window: Query<&Window, With<PrimaryWindow>>,
     settings: Res<MovementSettings>,
     key_bindings: Res<KeyBindings>,
-    mut query: Query<(&FlyCam, &mut Transform)>, //    mut query: Query<&mut Transform, With<FlyCam>>,
+    mut query: Query<(&CubeCameraMarker, &mut Transform)>, //    mut query: Query<&mut Transform, With<FlyCam>>,
 ) {
     if let Ok(window) = primary_window.get_single() {
         for (_camera, mut transform) in query.iter_mut() {
@@ -170,7 +163,7 @@ fn player_look(
     primary_window: Query<&Window, With<PrimaryWindow>>,
     mut state: ResMut<InputState>,
     motion: Res<Events<MouseMotion>>,
-    mut query: Query<&mut Transform, With<FlyCam>>,
+    mut query: Query<&mut Transform, With<CubeCameraMarker>>,
 ) {
     if let Ok(window) = primary_window.get_single() {
         for mut transform in query.iter_mut() {
@@ -215,7 +208,7 @@ fn cursor_grab(
 // Grab cursor when an entity with FlyCam is added
 fn initial_grab_on_flycam_spawn(
     mut primary_window: Query<&mut Window, With<PrimaryWindow>>,
-    query_added: Query<Entity, Added<FlyCam>>,
+    query_added: Query<Entity, Added<CubeCameraMarker>>,
 ) {
     if query_added.is_empty() {
         return;

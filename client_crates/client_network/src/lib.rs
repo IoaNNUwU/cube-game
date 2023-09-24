@@ -15,7 +15,7 @@ impl Plugin for ClientNetworkPlugin {
         let (client, transport) = config::config_client(None, None);
 
         app
-            .init_resource::<IncomingS2CPacketsQueue>()
+            .init_resource::<IncomingS2CPacketQueue>()
             .init_resource::<SendC2SPacketQueue>()
 
             .insert_resource(client)
@@ -37,11 +37,11 @@ impl Plugin for ClientNetworkPlugin {
 const CHANNEL: DefaultChannel = DefaultChannel::ReliableOrdered;
 
 #[derive(Default, Resource)]
-pub struct IncomingS2CPacketsQueue {
+pub struct IncomingS2CPacketQueue {
     coming_from_server_queue: Vec<Server2ClientPacket>,
 }
 
-impl IncomingS2CPacketsQueue {
+impl IncomingS2CPacketQueue {
     pub fn receive(&mut self) -> Option<Server2ClientPacket> {
         self.coming_from_server_queue.pop()
     }
@@ -51,7 +51,7 @@ impl IncomingS2CPacketsQueue {
     }
 }
 
-impl Iterator for IncomingS2CPacketsQueue {
+impl Iterator for IncomingS2CPacketQueue {
     type Item = Server2ClientPacket;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -61,7 +61,7 @@ impl Iterator for IncomingS2CPacketsQueue {
 
 fn add_s2c_packets_to_queue_on_message_from_server(
     mut renet_client: ResMut<RenetClient>,
-    mut incoming_packets_queue: ResMut<IncomingS2CPacketsQueue>,
+    mut incoming_packets_queue: ResMut<IncomingS2CPacketQueue>,
 ) {
     while let Some(packet) = renet_client.receive_message(CHANNEL) {
         if let Ok(packet) = protocol::deserialize::<Server2ClientPacket>(packet.as_ref()) {
