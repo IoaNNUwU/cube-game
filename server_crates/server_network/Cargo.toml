@@ -9,5 +9,9 @@ license.workspace = true
 
 [dependencies]
 bevy.workspace = true
+toml.workspace = true
+derive-new.workspace = true
+
 common_network = { workspace = true, features = ["server"] }
 protocol.workspace = true
+config.workspace = true

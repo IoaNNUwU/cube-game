@@ -1,9 +1,11 @@
+use derive_new::new;
 use math::Quat;
 use block::BlockState;
 use basic::position::*;
 
 use serde::{Deserialize, Serialize};
 
+#[derive(PartialEq)]
 #[derive(Debug, Clone)]
 #[derive(Serialize, Deserialize)]
 pub enum Client2ServerPacket {
@@ -23,6 +25,7 @@ pub enum Client2ServerPacket {
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Default, Debug, Clone, Hash)]
 #[derive(Serialize, Deserialize)]
+#[derive(new)]
 pub struct C2SConnect {
     pub player_name: String,
 }
@@ -30,6 +33,7 @@ pub struct C2SConnect {
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Default, Debug, Clone, Hash)]
 #[derive(Serialize, Deserialize)]
+#[derive(new)]
 pub struct C2SDisconnect {
     pub reason: String,
 }
@@ -37,13 +41,16 @@ pub struct C2SDisconnect {
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Default, Debug, Clone, Hash)]
 #[derive(Serialize, Deserialize)]
+#[derive(new)]
 pub struct C2SPlaceBlock {
     pub block_state: BlockState,
     pub position: WorldBlockPosition,
 }
 
+#[derive(PartialEq)]
 #[derive(Default, Debug, Clone)]
 #[derive(Serialize, Deserialize)]
+#[derive(new)]
 pub struct C2SPlayerMove {
     pub world_pos: WorldPosition,
     pub rotation: Quat,
@@ -52,6 +59,7 @@ pub struct C2SPlayerMove {
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Default, Debug, Clone, Hash)]
 #[derive(Serialize, Deserialize)]
+#[derive(new)]
 pub struct C2SChatMessage {
     pub message: String,
 }

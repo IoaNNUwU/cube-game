@@ -1,3 +1,4 @@
+use derive_new::new;
 use math::Quat;
 use block::BlockState;
 use basic::position::*;
@@ -6,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use chunk::Chunk;
 use common_world::ChunkPosInWorld;
 
-#[derive(Debug, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 #[derive(Serialize, Deserialize)]
 pub enum Server2ClientPacket {
     /// Answer to client's Ping packet. Provides server description in server list.
@@ -36,6 +37,7 @@ pub enum Server2ClientPacket {
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Default, Debug, Clone, Hash)]
 #[derive(Serialize, Deserialize)]
+#[derive(new)]
 pub struct S2CPing {
     pub server_name: String,
 }
@@ -43,6 +45,7 @@ pub struct S2CPing {
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Default, Debug, Clone, Hash)]
 #[derive(Serialize, Deserialize)]
+#[derive(new)]
 pub struct S2CKick {
     pub reason: String,
 }
@@ -50,6 +53,7 @@ pub struct S2CKick {
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Default, Debug, Clone, Hash)]
 #[derive(Serialize, Deserialize)]
+#[derive(new)]
 pub struct S2CPlaceBlock {
     pub block_state: BlockState,
     pub position: WorldBlockPosition,
@@ -58,13 +62,15 @@ pub struct S2CPlaceBlock {
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Default, Debug, Clone, Hash)]
 #[derive(Serialize, Deserialize)]
+#[derive(new)]
 pub struct S2CPlaceChunk {
     pub column: Box<Chunk>,
     pub position: ChunkPosInWorld,
 }
 
-#[derive(Default, Debug, Clone)]
+#[derive(PartialEq, Default, Debug, Clone)]
 #[derive(Serialize, Deserialize)]
+#[derive(new)]
 pub struct S2cPlayerMove {
     pub id: u64,
     pub world_pos: WorldPosition,
@@ -74,6 +80,7 @@ pub struct S2cPlayerMove {
 #[derive(Ord, PartialOrd, Eq, PartialEq)]
 #[derive(Default, Debug, Clone, Hash)]
 #[derive(Serialize, Deserialize)]
+#[derive(new)]
 pub struct S2CChatMessage {
     pub message: String,
 }

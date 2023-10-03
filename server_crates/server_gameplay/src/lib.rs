@@ -8,7 +8,7 @@ pub struct ServerGameplayPlugin;
 impl Plugin for ServerGameplayPlugin {
     fn build(&self, app: &mut App) {
         app
-            .insert_resource(ServerName("HelloWorldCraft".to_string()))
+            .insert_resource(ServerName("HelloWorldServer".to_string()))
             .add_systems(Update, (
                 send_ping_on_ping_from_client,
                 send_allow_connect_on_connect_from_client,
@@ -20,14 +20,14 @@ impl Plugin for ServerGameplayPlugin {
 pub struct ServerName(pub String);
 
 fn send_ping_on_ping_from_client(
-    mut c2s_queue: ResMut<IncomingC2SPacketsQueue>,
+    c2s_queue: ResMut<IncomingC2SPacketsQueue>,
     mut s2c_queue: ResMut<SendS2CPacketsQueue>,
     server_name: Res<ServerName>,
 ) {
-    for Client2ServerMessage { client_id, packet } in c2s_queue.incoming_packets() {
+    for Client2ServerMessage { client_id, packet } in c2s_queue.iter() {
         if let Client2ServerPacket::Ping = packet {
             let message = Server2ClientMessage {
-                client_id,
+                client_id: *client_id,
                 packet: Server2ClientPacket::Ping(S2CPing {
                     server_name: server_name.0.to_string(),
                 }),
@@ -38,13 +38,13 @@ fn send_ping_on_ping_from_client(
 }
 
 fn send_allow_connect_on_connect_from_client(
-    mut c2s_queue: ResMut<IncomingC2SPacketsQueue>,
+    c2s_queue: ResMut<IncomingC2SPacketsQueue>,
     mut s2c_queue: ResMut<SendS2CPacketsQueue>,
 ) {
-    for Client2ServerMessage { client_id, packet } in c2s_queue.incoming_packets() {
+    for Client2ServerMessage { client_id, packet } in c2s_queue.iter() {
         if let Client2ServerPacket::Connect(C2SConnect { player_name }) = packet {
             let message = Server2ClientMessage {
-                client_id,
+                client_id: *client_id,
                 packet: Server2ClientPacket::Joined,
             };
             s2c_queue.send(message);
