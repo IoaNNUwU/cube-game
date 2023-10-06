@@ -54,7 +54,3 @@ fn send_connection_request_on_ping_from_server(
         }
     }
 }
-
-fn load_menu_elements_on_allow_connect() {
-    
-}

@@ -1,6 +1,4 @@
 use bevy::prelude::*;
-use block::BlockState;
-use block::solid_block::{CommonBlockAttrs, SolidBlock};
 use textures::AssociatedTexture;
 
 use client_state::ClientState;

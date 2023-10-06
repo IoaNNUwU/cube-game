@@ -14,7 +14,7 @@ impl Plugin for TexturesPlugin {
 }
 
 fn setup_textures(
-    asset_server: Res<AssetServer>
+    _asset_server: Res<AssetServer>
 ) {
     // asset_server.load_folder(BLOCKS_PATH).unwrap_or_else(|_| panic!("Unable to load {:?}", BLOCKS_PATH));
 }

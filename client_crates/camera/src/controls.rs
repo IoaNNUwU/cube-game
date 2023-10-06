@@ -1,3 +1,3 @@
 /// Moves camera on input
-fn move_camera_on_input() {
+pub fn move_camera_on_input() {
 }

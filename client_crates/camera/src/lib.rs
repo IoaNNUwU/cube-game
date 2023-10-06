@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use bevy::prelude::*;
 
 pub mod controls;
@@ -15,8 +17,8 @@ pub struct CubeCameraPlugin;
 
 impl Plugin for CubeCameraPlugin {
 
-    fn build(&self, app: &mut App) {
-        
+    fn build(&self, _app: &mut App) {
+        todo!()
     }
 }
 

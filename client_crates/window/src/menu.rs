@@ -54,7 +54,7 @@ pub enum MenuState {
 }
 
 #[derive(Component, Default)]
-enum MenuButtonAction {
+pub enum MenuButtonAction {
     #[default]
     None,
 

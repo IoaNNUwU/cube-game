@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use common_network::Channel;
 use protocol::client2server::{C2SConnect, Client2ServerPacket};
 use protocol::server2client::{S2CChatMessage, S2CPing, Server2ClientPacket};
 use server_network::{Client2ServerMessage, IncomingC2SPacketsQueue, SendS2CPacketsQueue, Server2ClientMessage};
@@ -32,7 +33,7 @@ fn send_ping_on_ping_from_client(
                     server_name: server_name.0.to_string(),
                 }),
             };
-            s2c_queue.send(message);
+            s2c_queue.send(message, Channel::ReliableOrdered);
         }
     }
 }
@@ -47,10 +48,10 @@ fn send_allow_connect_on_connect_from_client(
                 client_id: *client_id,
                 packet: Server2ClientPacket::Joined,
             };
-            s2c_queue.send(message);
+            s2c_queue.send(message, Channel::ReliableOrdered);
             s2c_queue.send_all(Server2ClientPacket::Message(S2CChatMessage {
                 message: format!("> {} joined", player_name),
-            }))
+            }), Channel::ReliableOrdered);
         }
     }
 }

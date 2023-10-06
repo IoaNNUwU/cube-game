@@ -1,5 +1,5 @@
 mod loading_screen;
-mod menu;
+pub mod menu;
 
 use bevy::prelude::*;
 
@@ -57,7 +57,7 @@ pub enum InventoryState {
 
 // One of the two settings that can be set through the menu. It will be a resource in the app
 #[derive(Resource, Debug, Component, PartialEq, Eq, Clone, Copy)]
-enum DisplayQuality {
+pub enum DisplayQuality {
     Low,
     Medium,
     High,
