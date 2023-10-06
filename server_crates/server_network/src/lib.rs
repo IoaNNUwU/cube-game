@@ -1,11 +1,14 @@
 use bevy::prelude::*;
+use common_network::transport::NetcodeServerTransport;
 use derive_new::new;
+
+use strum::IntoEnumIterator;
 
 use std::ops::Deref;
 
 use common_network::NetcodeServerPlugin;
 use common_network::RenetServerPlugin;
-use common_network::{Channels, RenetServer, ServerEvent};
+use common_network::{Channel, RenetServer, ServerEvent};
 
 use protocol::client2server::{C2SDisconnect, Client2ServerPacket};
 use protocol::server2client::Server2ClientPacket;
@@ -23,6 +26,7 @@ impl Plugin for ServerNetworkPlugin {
             .insert_resource(server)
             .insert_resource(transport)
             .add_plugins((RenetServerPlugin, NetcodeServerPlugin))
+            .add_systems(Startup, print_exposed_ip)
             .add_systems(
                 PreUpdate,
                 (
@@ -30,8 +34,16 @@ impl Plugin for ServerNetworkPlugin {
                     add_connect_and_disconnect_message_to_queue_on_server_event,
                 ),
             )
-            .add_systems(PostUpdate, (send_s2c_packets_from_queue,));
+            .add_systems(PostUpdate, (clear_c2s_queue_after_all_messages_read,))
+            .add_systems(
+                PostUpdate,
+                (send_s2c_packets_from_queue_and_clear_it_after,),
+            );
     }
+}
+
+fn print_exposed_ip(transport: Res<NetcodeServerTransport>) {
+    println!("Server started on {}", transport.addr())
 }
 
 /// ### Example bevy system
@@ -71,7 +83,7 @@ fn add_c2s_packet_to_queue_on_message_from_client(
     mut clients2server_connection: ResMut<IncomingC2SPacketsQueue>,
 ) {
     for client_id in renet_server.clients_id() {
-        for channel in Channels {
+        for channel in Channel::iter() {
             while let Some(packet) = renet_server.receive_message(client_id, channel) {
                 if let Ok(packet) = protocol::deserialize::<Client2ServerPacket>(packet.as_ref()) {
                     let message = Client2ServerMessage { client_id, packet };
@@ -104,6 +116,10 @@ fn add_connect_and_disconnect_message_to_queue_on_server_event(
     }
 }
 
+fn clear_c2s_queue_after_all_messages_read(mut c2s_queue: ResMut<IncomingC2SPacketsQueue>) {
+    c2s_queue.0.clear()
+}
+
 /// ### Example bevy system
 /// ```rust
 /// use server_network::SendS2CPacketsQueue;
@@ -119,22 +135,22 @@ fn add_connect_and_disconnect_message_to_queue_on_server_event(
 /// ```
 #[derive(Default, Resource)]
 pub struct SendS2CPacketsQueue {
-    send_to_clients_queue: Vec<Server2ClientMessage>,
-    send_all_queue: Vec<Server2ClientPacket>,
+    send_to_specific_client_queue: Vec<(Channel, Server2ClientMessage)>,
+    send_all_queue: Vec<(Channel, Server2ClientPacket)>,
 }
 
 impl SendS2CPacketsQueue {
-    pub fn send(&mut self, message: Server2ClientMessage) {
-        self.send_to_clients_queue.push(message);
+    pub fn send(&mut self, message: Server2ClientMessage, channel: Channel) {
+        self.send_to_specific_client_queue.push((channel, message));
     }
 
-    pub fn send_to(&mut self, client_id: u64, packet: Server2ClientPacket) {
-        self.send_to_clients_queue
-            .push(Server2ClientMessage { client_id, packet });
+    pub fn send_to(&mut self, client_id: u64, packet: Server2ClientPacket, channel: Channel) {
+        self.send_to_specific_client_queue
+            .push((channel, Server2ClientMessage { client_id, packet }));
     }
 
-    pub fn send_all(&mut self, packet: Server2ClientPacket) {
-        self.send_all_queue.push(packet);
+    pub fn send_all(&mut self, packet: Server2ClientPacket, channel: Channel) {
+        self.send_all_queue.push((channel, packet));
     }
 }
 
@@ -144,21 +160,20 @@ pub struct Server2ClientMessage {
     pub packet: Server2ClientPacket,
 }
 
-fn send_s2c_packets_from_queue(
+fn send_s2c_packets_from_queue_and_clear_it_after(
     mut renet_server: ResMut<RenetServer>,
     mut send_packets_queue: ResMut<SendS2CPacketsQueue>,
 ) {
-    for channel in Channels {
-        while let Some(s2c_message) = send_packets_queue.send_to_clients_queue.pop() {
-            let message = protocol::serialize(&s2c_message.packet);
-            renet_server.send_message(s2c_message.client_id, channel, message);
-        }
-        while let Some(packet) = send_packets_queue.send_all_queue.pop() {
-            let message = protocol::serialize(&packet);
-
-            for id in renet_server.clients_id() {
-                renet_server.send_message(id, channel, message.clone());
-            }
+    for (channel, s2c_message) in send_packets_queue.send_to_specific_client_queue.iter() {
+        let message = protocol::serialize(&s2c_message.packet);
+        renet_server.send_message(s2c_message.client_id, *channel, message);
+    }
+    for (channel, s2c_packet) in send_packets_queue.send_all_queue.iter() {
+        let message = protocol::serialize(&s2c_packet);
+        for id in renet_server.clients_id() {
+            renet_server.send_message(id, *channel, message.clone());
         }
     }
+    send_packets_queue.send_to_specific_client_queue.clear();
+    send_packets_queue.send_all_queue.clear();
 }

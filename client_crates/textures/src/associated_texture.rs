@@ -1,4 +1,4 @@
-use heck::{ToPascalCase, ToSnakeCase};
+use heck::ToSnakeCase;
 use item::fancy_item::FancyBlockItem;
 use item::Item;
 use item::liquid_item::LiquidBlockItem;

@@ -14,6 +14,7 @@ protocol.workspace = true
 # External crates
 bevy_renet = "0.0.9"
 bevy.workspace = true
+strum.workspace = true
 
 [features]
 server = []

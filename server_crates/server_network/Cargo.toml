@@ -11,6 +11,7 @@ license.workspace = true
 bevy.workspace = true
 toml.workspace = true
 derive-new.workspace = true
+strum.workspace = true
 
 common_network = { workspace = true, features = ["server"] }
 protocol.workspace = true

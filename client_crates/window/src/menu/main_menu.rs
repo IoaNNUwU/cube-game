@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use item::Item;
 use item::solid_item::SolidBlockItem;
 use textures::AssociatedTexture;
 

@@ -23,6 +23,7 @@ pub use client::*;
 
 pub use bevy_renet::renet::*;
 pub use bevy_renet::transport::*;
+use strum::EnumIter;
 
 pub const DEFAULT_SERVER_ADDRESS: SocketAddr = local_host(25344);
 pub const DEFAULT_CLIENT_BIND_ADDRESS: SocketAddr = local_host(25343);
@@ -39,13 +40,20 @@ pub fn ip(ip: impl Into<[u8; 4]>, port: u16) -> SocketAddr {
     ))
 }
 
-pub struct Channels;
+#[derive(EnumIter, Clone, Copy)]
+pub enum Channel {
+    Unreliable = 0,
+    ReliableUnordered = 1,
+    ReliableOrdered = 2,
+}
 
-impl Channels {
-    pub const UNRELIABLE: u8 = 0;
-    pub const RELIABLE_ORDERED: u8 = 1;
-    pub const RELIABLE_UNORDERED: u8 = 2;
+impl From<Channel> for u8 {
+    fn from(channel: Channel) -> u8 {
+        channel as u8
+    }
+}
 
+impl Channel {
     pub const CONFIG: [ChannelConfig; 3] = [
         UNRELIABLE_CHANNEL_CONFIG,
         RELIABLE_ORDERED_CHANNEL_CONFIG,
@@ -53,24 +61,14 @@ impl Channels {
     ];
 }
 
-impl IntoIterator for Channels {
-    type Item = u8;
-
-    type IntoIter = std::array::IntoIter<u8, 3>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        [Self::UNRELIABLE, Self::RELIABLE_ORDERED, Self::RELIABLE_UNORDERED].into_iter()
-    }
-}
-
 const UNRELIABLE_CHANNEL_CONFIG: ChannelConfig = ChannelConfig {
-    channel_id: Channels::UNRELIABLE,
+    channel_id: Channel::Unreliable as u8,
     max_memory_usage_bytes: 5 * 1024 * 1024,
     send_type: SendType::Unreliable,
 };
 
 const RELIABLE_UNORDERED_CHANNEL_CONFIG: ChannelConfig = ChannelConfig {
-    channel_id: Channels::RELIABLE_UNORDERED,
+    channel_id: Channel::ReliableUnordered as u8,
     max_memory_usage_bytes: 5 * 1024 * 1024,
     send_type: SendType::ReliableUnordered {
         resend_time: Duration::from_millis(300),
@@ -78,7 +76,7 @@ const RELIABLE_UNORDERED_CHANNEL_CONFIG: ChannelConfig = ChannelConfig {
 };
 
 const RELIABLE_ORDERED_CHANNEL_CONFIG: ChannelConfig = ChannelConfig {
-    channel_id: Channels::RELIABLE_ORDERED,
+    channel_id: Channel::ReliableOrdered as u8,
     max_memory_usage_bytes: 5 * 1024 * 1024,
     send_type: SendType::ReliableOrdered {
         resend_time: Duration::from_millis(300),

@@ -1,2 +1,6 @@
 [server]
-ip = "127.0.0.1:33000"
+expose_ip = "127.0.0.1"
+expose_port = 4456
+
+[client]
+local_port = 4455
